@@ -34,7 +34,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #ffffff;
             min-height: 100vh;
             color: var(--text-primary);
             line-height: 1.5;
@@ -44,11 +44,9 @@
         .chat-container {
             display: flex;
             height: 100vh;
-            max-width: 1400px;
-            margin: 0 auto;
+            width: 100%;
+            margin: 0;
             background: var(--sidebar-bg);
-            box-shadow: var(--shadow-lg);
-            border-radius: var(--border-radius);
             overflow: hidden;
         }
 
@@ -131,22 +129,17 @@
             min-width: 200px;
             overflow: hidden;
             margin-top: 8px;
-            animation: dropdownSlide 0.2s ease-out;
-        }
-
-        @keyframes dropdownSlide {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.2s ease-out;
         }
 
         .dropdown-menu.show {
             display: block;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .dropdown-header {
@@ -313,7 +306,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #ffffff;
             padding: 20px;
         }
 
@@ -325,6 +318,7 @@
             width: 100%;
             max-width: 400px;
             position: relative;
+            border: 1px solid #e9ecef;
         }
 
         .auth-form::before {
@@ -413,9 +407,7 @@
         /* Mobile Responsive Design */
         @media (max-width: 768px) {
             .chat-container {
-                border-radius: 0;
                 height: 100vh;
-                max-width: 100%;
             }
             
             .contacts-sidebar {
@@ -458,6 +450,11 @@
 
             .message-time {
                 font-size: 10px;
+            }
+
+            .dropdown-menu {
+                right: 8px;
+                min-width: 180px;
             }
         }
 

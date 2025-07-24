@@ -107,7 +107,7 @@
     </div>
 
     <!-- Right Side - Welcome Screen -->
-    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); text-align: center; padding: 48px;">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8f9fa; text-align: center; padding: 48px;">
         
         <div style="width: 96px; height: 96px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; margin-bottom: 32px; box-shadow: 0 8px 24px rgba(0, 168, 132, 0.3);">💬</div>
         
@@ -170,7 +170,13 @@
 <script>
 function showUserMenu() {
     const menu = document.getElementById('userMenu');
-    menu.classList.toggle('show');
+    const isVisible = menu.classList.contains('show');
+    
+    if (isVisible) {
+        menu.classList.remove('show');
+    } else {
+        menu.classList.add('show');
+    }
 }
 
 // Close user menu when clicking outside
@@ -179,6 +185,14 @@ document.addEventListener('click', function(e) {
     const menuBtn = document.getElementById('menuBtn');
     
     if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
+        menu.classList.remove('show');
+    }
+});
+
+// Close menu when pressing Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const menu = document.getElementById('userMenu');
         menu.classList.remove('show');
     }
 });
