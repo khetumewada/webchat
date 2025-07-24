@@ -27,18 +27,18 @@
         </div>
 
         <!-- User Menu Dropdown -->
-        <div id="userMenu" style="display: none; position: absolute; top: 68px; right: 16px; background: white; border: none; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 1000; min-width: 180px; overflow: hidden;">
-            <div style="padding: 16px; border-bottom: 1px solid var(--border-color); background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+        <div id="userMenu" class="dropdown-menu">
+            <div class="dropdown-header">
                 <div style="font-weight: 600; color: white; font-size: 13px;">{{ current_user.get_full_name|default:current_user.username }}</div>
                 <div style="font-size: 11px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>
             </div>
             <div style="padding: 8px 0;">
-                <a href="{% url 'accounts:profile' %}" style="display: flex; align-items: center; padding: 12px 16px; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 500; transition: var(--transition);" onmouseover="this.style.backgroundColor='var(--hover-color)'" onmouseout="this.style.backgroundColor='transparent'">
+                <a href="{% url 'accounts:profile' %}" class="dropdown-item">
                     <span style="margin-right: 10px; font-size: 14px;">👤</span>
                     Profile Settings
                 </a>
                 <div style="border-top: 1px solid var(--border-color); margin: 6px 0;"></div>
-                <a href="{% url 'accounts:logout' %}" style="display: flex; align-items: center; padding: 12px 16px; color: #d32f2f; text-decoration: none; font-size: 13px; font-weight: 500; transition: var(--transition);" onmouseover="this.style.backgroundColor='#ffebee'" onmouseout="this.style.backgroundColor='transparent'">
+                <a href="{% url 'accounts:logout' %}" class="dropdown-item danger">
                     <span style="margin-right: 10px; font-size: 14px;">🚪</span>
                     Logout
                 </a>
@@ -88,7 +88,7 @@
                                 <div class="contact-meta">
                                     {% with last_message=chat.get_last_message %}
                                         {% if last_message %}
-                                            <div class="message-time">{{ last_message.timestamp|date:"g:i A" }}</div>
+                                            <div class="message-time">{{ last_message.timestamp|format_message_time }}</div>
                                         {% endif %}
                                     {% endwith %}
                                 </div>
@@ -142,7 +142,7 @@
 {% if messages %}
     <div id="messagesContainer" style="position: fixed; top: 24px; right: 24px; z-index: 1001; max-width: 320px;">
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}" style="background: {% if message.tags == 'success' %}linear-gradient(135deg, var(--secondary-color), var(--primary-color)){% elif message.tags == 'error' %}linear-gradient(135deg, #ff6b6b, #ee5a24){% else %}linear-gradient(135deg, #74b9ff, #0984e3){% endif %}; color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: endif%}; color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; font-size: 13px; animation: slideIn 0.4s ease-out;">
+            <div class="alert alert-{{ message.tags }}" style="background: {% if message.tags == 'success' %}linear-gradient(135deg, var(--secondary-color), var(--primary-color)){% elif message.tags == 'error' %}linear-gradient(135deg, #ff6b6b, #ee5a24){% else %}linear-gradient(135deg, #74b9ff, #0984e3){% endif %}; color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; font-size: 13px; animation: slideIn 0.4s ease-out;">
                 {{ message }}
             </div>
         {% endfor %}
@@ -170,7 +170,7 @@
 <script>
 function showUserMenu() {
     const menu = document.getElementById('userMenu');
-    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    menu.classList.toggle('show');
 }
 
 // Close user menu when clicking outside
@@ -179,7 +179,7 @@ document.addEventListener('click', function(e) {
     const menuBtn = document.getElementById('menuBtn');
     
     if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
-        menu.style.display = 'none';
+        menu.classList.remove('show');
     }
 });
 

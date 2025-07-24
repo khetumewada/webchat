@@ -21,3 +21,27 @@ def get_avatar_color(user_id):
         "linear-gradient(135deg, #f7b731, #fa8231)",
     ]
     return colors[user_id % len(colors)]
+
+@register.filter
+def format_message_time(timestamp):
+    """Format message timestamp to show relative time or time"""
+    from django.utils import timezone
+    from datetime import datetime, timedelta
+    
+    now = timezone.now()
+    
+    # If message is from today, show time
+    if timestamp.date() == now.date():
+        return timestamp.strftime('%I:%M %p').lstrip('0')
+    
+    # If message is from yesterday
+    elif timestamp.date() == (now - timedelta(days=1)).date():
+        return 'Yesterday'
+    
+    # If message is from this week
+    elif (now - timestamp).days < 7:
+        return timestamp.strftime('%A')  # Day name
+    
+    # If message is older
+    else:
+        return timestamp.strftime('%m/%d/%y')
