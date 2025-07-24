@@ -69,7 +69,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message_data = await self.save_message(message_content)
                 
                 if message_data:
-                    # Send message to chat group
+                    # Send message to chat group with proper timestamp
                     await self.channel_layer.group_send(
                         self.chat_group_name,
                         {
@@ -156,9 +156,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             
             logger.info(f"Message saved: {message.id}")
             
+            # Return timestamp in the format we want (like 5:49 PM)
             return {
                 'id': message.id,
-                'timestamp': message.timestamp.strftime('%I:%M %p'),
+                'timestamp': message.timestamp.strftime('%I:%M %p').lstrip('0'),
             }
         except Chat.DoesNotExist:
             logger.error(f"Chat {self.chat_id} does not exist when saving message")

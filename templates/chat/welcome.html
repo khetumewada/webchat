@@ -3,47 +3,52 @@
 {% block title %}Welcome to WebChat{% endblock %}
 
 {% block content %}
-<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #25d366, #128c7e);">
-    <div style="background: white; padding: 60px 40px; border-radius: 15px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); text-align: center; max-width: 500px; width: 90%;">
-        <div style="width: 100px; height: 100px; background: linear-gradient(45deg, #25d366, #128c7e); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; margin: 0 auto 30px;">💬</div>
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px;">
+    <div style="background: white; padding: 60px 40px; border-radius: 25px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2); text-align: center; max-width: 600px; width: 90%; position: relative; overflow: hidden;">
         
-        <h1 style="font-size: 36px; color: #333; margin-bottom: 15px; font-weight: 300;">WebChat</h1>
-        <p style="font-size: 18px; color: #666; margin-bottom: 40px; line-height: 1.6;">
-            Connect with friends and family through secure, real-time messaging. 
-            Experience seamless communication with our WhatsApp-inspired interface.
+        <!-- Decorative elements -->
+        <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(0, 168, 132, 0.1), rgba(37, 211, 102, 0.1)); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
+        <div style="position: absolute; bottom: -30px; left: -30px; width: 60px; height: 60px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border-radius: 50%; animation: float 4s ease-in-out infinite reverse;"></div>
+        
+        <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #00a884, #25d366); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 48px; color: white; margin: 0 auto 40px; box-shadow: 0 15px 40px rgba(0, 168, 132, 0.3); animation: pulse 3s infinite;">💬</div>
+        
+        <h1 style="font-size: 42px; color: #111b21; margin-bottom: 20px; font-weight: 700; background: linear-gradient(135deg, #00a884, #25d366); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">WebChat</h1>
+        
+        <p style="font-size: 18px; color: #667781; margin-bottom: 50px; line-height: 1.8; max-width: 400px; margin-left: auto; margin-right: auto;">
+            Connect with friends and family through secure, real-time messaging with our beautiful, modern interface.
         </p>
         
-        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-            <a href="{% url 'register' %}" style="background-color: #25d366; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 16px; transition: background-color 0.3s;">
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px;">
+            <a href="{% url 'register' %}" style="background: linear-gradient(135deg, #00a884, #25d366); color: white; padding: 18px 35px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 8px 25px rgba(0, 168, 132, 0.3); position: relative; overflow: hidden;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 35px rgba(0, 168, 132, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(0, 168, 132, 0.3)'">
                 Get Started
             </a>
-            <a href="{% url 'login' %}" style="background-color: transparent; color: #25d366; padding: 15px 30px; border: 2px solid #25d366; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 16px; transition: all 0.3s;">
+            <a href="{% url 'login' %}" style="background: transparent; color: #00a884; padding: 18px 35px; border: 2px solid #00a884; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.background='#00a884'; this.style.color='white'; this.style.transform='translateY(-3px)'" onmouseout="this.style.background='transparent'; this.style.color='#00a884'; this.style.transform='translateY(0)'">
                 Sign In
             </a>
         </div>
         
-        <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #eee;">
-            <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;">Features</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: left;">
-                <div>
-                    <div style="color: #25d366; font-size: 24px; margin-bottom: 10px;">⚡</div>
-                    <h4 style="color: #333; margin-bottom: 5px;">Real-time Messaging</h4>
-                    <p style="color: #666; font-size: 14px;">Instant message delivery with WebSocket technology</p>
+        <div style="border-top: 1px solid #e9edef; padding-top: 40px;">
+            <h3 style="color: #111b21; margin-bottom: 30px; font-size: 24px; font-weight: 600;">Why Choose WebChat?</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; text-align: left;">
+                <div style="padding: 20px; border-radius: 12px; background: linear-gradient(135deg, rgba(0, 168, 132, 0.05), rgba(37, 211, 102, 0.05)); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="color: #00a884; font-size: 32px; margin-bottom: 15px;">⚡</div>
+                    <h4 style="color: #111b21; margin-bottom: 8px; font-weight: 600;">Lightning Fast</h4>
+                    <p style="color: #667781; font-size: 14px; line-height: 1.6;">Instant message delivery with WebSocket technology for real-time communication</p>
                 </div>
-                <div>
-                    <div style="color: #25d366; font-size: 24px; margin-bottom: 10px;">🔒</div>
-                    <h4 style="color: #333; margin-bottom: 5px;">Secure & Private</h4>
-                    <p style="color: #666; font-size: 14px;">Your conversations are protected and private</p>
+                <div style="padding: 20px; border-radius: 12px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="color: #667eea; font-size: 32px; margin-bottom: 15px;">🔒</div>
+                    <h4 style="color: #111b21; margin-bottom: 8px; font-weight: 600;">Secure & Private</h4>
+                    <p style="color: #667781; font-size: 14px; line-height: 1.6;">Your conversations are protected with enterprise-grade security</p>
                 </div>
-                <div>
-                    <div style="color: #25d366; font-size: 24px; margin-bottom: 10px;">📱</div>
-                    <h4 style="color: #333; margin-bottom: 5px;">Mobile Friendly</h4>
-                    <p style="color: #666; font-size: 14px;">Works perfectly on all devices and screen sizes</p>
+                <div style="padding: 20px; border-radius: 12px; background: linear-gradient(135deg, rgba(255, 107, 107, 0.05), rgba(238, 90, 36, 0.05)); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="color: #ff6b6b; font-size: 32px; margin-bottom: 15px;">📱</div>
+                    <h4 style="color: #111b21; margin-bottom: 8px; font-weight: 600;">Responsive Design</h4>
+                    <p style="color: #667781; font-size: 14px; line-height: 1.6;">Beautiful interface that works perfectly on all devices</p>
                 </div>
-                <div>
-                    <div style="color: #25d366; font-size: 24px; margin-bottom: 10px;">👥</div>
-                    <h4 style="color: #333; margin-bottom: 5px;">Easy to Use</h4>
-                    <p style="color: #666; font-size: 14px;">Familiar WhatsApp-like interface</p>
+                <div style="padding: 20px; border-radius: 12px; background: linear-gradient(135deg, rgba(253, 203, 110, 0.05), rgba(225, 112, 85, 0.05)); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="color: #fdcb6e; font-size: 32px; margin-bottom: 15px;">👥</div>
+                    <h4 style="color: #111b21; margin-bottom: 8px; font-weight: 600;">Easy to Use</h4>
+                    <p style="color: #667781; font-size: 14px; line-height: 1.6;">Intuitive interface inspired by modern messaging apps</p>
                 </div>
             </div>
         </div>
@@ -51,9 +56,34 @@
 </div>
 
 <style>
-a:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+a {
+    position: relative;
+    overflow: hidden;
+}
+
+a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+a:hover::before {
+    left: 100%;
 }
 </style>
 {% endblock %}
