@@ -40,7 +40,7 @@ def logout_view(request):
     
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('welcome')
+    return redirect('accounts:welcome')
 
 @login_required
 def profile_view(request):
