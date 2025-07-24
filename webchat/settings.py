@@ -96,8 +96,8 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication settings
-LOGIN_URL = '/welcome/'  # Redirect to welcome page instead of login
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/home/'  # Redirect to chat home after login
 LOGOUT_REDIRECT_URL = '/welcome/'
 
 # Messages framework

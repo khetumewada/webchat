@@ -10,6 +10,12 @@ from django.contrib import messages
 from .models import Chat, Message, UserProfile, MessageRead
 import json
 
+def root_view(request):
+    """Handle root URL - redirect based on authentication status"""
+    if request.user.is_authenticated:
+        return redirect('chat_home')
+    return redirect('welcome')
+
 def register_view(request):
     if request.user.is_authenticated:
         return redirect('chat_home')
@@ -49,7 +55,7 @@ def logout_view(request):
     
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('login')
+    return redirect('welcome')
 
 @login_required
 def chat_home(request):

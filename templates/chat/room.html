@@ -166,8 +166,8 @@
                 <span style="font-weight: 500;">{{ current_user.get_full_name|default:current_user.username }}</span>
             </div>
             <div class="header-actions">
-                <a href="{% url 'chat_home' %}" class="action-btn">🏠</a>
-                <a href="{% url 'logout' %}" class="action-btn">🚪</a>
+                <a href="{% url 'chat_home' %}" class="action-btn" title="Home">🏠</a>
+                <a href="{% url 'logout' %}" class="action-btn" title="Logout">🚪</a>
             </div>
         </div>
 
