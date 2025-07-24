@@ -16,11 +16,34 @@
                         {{ current_user.username|slice:":2"|upper }}
                     {% endif %}
                 </div>
-                <span style="font-weight: 500;">{{ current_user.get_full_name|default:current_user.username }}</span>
+                <div>
+                    <div style="font-weight: 500; font-size: 14px;">{{ current_user.get_full_name|default:current_user.username }}</div>
+                    <div style="font-size: 12px; color: #667781;">@{{ current_user.username }}</div>
+                </div>
             </div>
             <div class="header-actions">
-                <button class="action-btn" onclick="showNewChatModal()">💬</button>
-                <a href="{% url 'logout' %}" class="action-btn">🚪</a>
+                <button class="action-btn" onclick="showNewChatModal()" title="New Chat">💬</button>
+                <button class="action-btn" onclick="showUserMenu()" title="Menu" id="menuBtn">⋮</button>
+            </div>
+        </div>
+
+        <!-- User Menu Dropdown -->
+        <div id="userMenu" style="display: none; position: absolute; top: 70px; right: 20px; background: white; border: 1px solid #e9edef; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; min-width: 200px;">
+            <div style="padding: 15px; border-bottom: 1px solid #f0f2f5;">
+                <div style="font-weight: 500; color: #111b21;">{{ current_user.get_full_name|default:current_user.username }}</div>
+                <div style="font-size: 13px; color: #667781;">@{{ current_user.username }}</div>
+            </div>
+            <div style="padding: 8px 0;">
+                <a href="#" style="display: block; padding: 12px 20px; color: #111b21; text-decoration: none; font-size: 14px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f5f6f6'" onmouseout="this.style.backgroundColor='transparent'">
+                    👤 Profile Settings
+                </a>
+                <a href="#" style="display: block; padding: 12px 20px; color: #111b21; text-decoration: none; font-size: 14px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f5f6f6'" onmouseout="this.style.backgroundColor='transparent'">
+                    🔔 Notifications
+                </a>
+                <div style="border-top: 1px solid #f0f2f5; margin: 8px 0;"></div>
+                <a href="{% url 'logout' %}" style="display: block; padding: 12px 20px; color: #d32f2f; text-decoration: none; font-size: 14px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#ffebee'" onmouseout="this.style.backgroundColor='transparent'">
+                    🚪 Logout
+                </a>
             </div>
         </div>
 
@@ -49,7 +72,11 @@
                                     <div class="contact-last-message">
                                         {% with last_message=chat.get_last_message %}
                                             {% if last_message %}
-                                                {{ last_message.content|truncatechars:50 }}
+                                                {% if last_message.sender == current_user %}
+                                                    You: {{ last_message.content|truncatechars:40 }}
+                                                {% else %}
+                                                    {{ last_message.content|truncatechars:50 }}
+                                                {% endif %}
                                             {% else %}
                                                 Start a conversation...
                                             {% endif %}
@@ -80,11 +107,14 @@
     <!-- Right Side - Welcome Screen -->
     <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #f8f9fa; text-align: center; padding: 40px;">
         <div style="width: 120px; height: 120px; background: linear-gradient(45deg, #25d366, #128c7e); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 48px; color: white; margin-bottom: 30px;">💬</div>
-        <h1 style="font-size: 32px; color: #41525d; margin-bottom: 15px; font-weight: 300;">WebChat</h1>
-        <p style="font-size: 16px; color: #667781; line-height: 1.5;">
+        <h1 style="font-size: 32px; color: #41525d; margin-bottom: 15px; font-weight: 300;">Welcome to WebChat</h1>
+        <p style="font-size: 16px; color: #667781; line-height: 1.5; margin-bottom: 30px;">
             Send and receive messages in real-time.<br>
             Select a chat to start messaging or create a new conversation.
         </p>
+        <button onclick="showNewChatModal()" style="background-color: #25d366; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background-color 0.3s;">
+            Start New Chat
+        </button>
     </div>
 </div>
 
@@ -99,6 +129,28 @@
         </div>
     </div>
 </div>
+
+<!-- Messages Display -->
+{% if messages %}
+    <div id="messagesContainer" style="position: fixed; top: 20px; right: 20px; z-index: 1001;">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="background: {% if message.tags == 'success' %}#d4edda{% elif message.tags == 'error' %}#f8d7da{% else %}#d1ecf1{% endif %}; color: {% if message.tags == 'success' %}#155724{% elif message.tags == 'error' %}#721c24{% else %}#0c5460{% endif %}; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        // Auto-hide messages after 5 seconds
+        setTimeout(() => {
+            const container = document.getElementById('messagesContainer');
+            if (container) {
+                container.style.opacity = '0';
+                container.style.transition = 'opacity 0.5s';
+                setTimeout(() => container.remove(), 500);
+            }
+        }, 5000);
+    </script>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -112,6 +164,21 @@ function hideNewChatModal() {
     document.getElementById('userSearchInput').value = '';
     document.getElementById('userSearchResults').innerHTML = '';
 }
+
+function showUserMenu() {
+    const menu = document.getElementById('userMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close user menu when clicking outside
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('userMenu');
+    const menuBtn = document.getElementById('menuBtn');
+    
+    if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
+        menu.style.display = 'none';
+    }
+});
 
 // Search users
 document.getElementById('userSearchInput').addEventListener('input', function() {
@@ -141,12 +208,13 @@ document.getElementById('userSearchInput').addEventListener('input', function() 
                     const avatarColor = colors[user.id % colors.length];
                     
                     userDiv.innerHTML = `
-                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${avatarColor}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 15px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${avatarColor}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 15px; position: relative;">
                             ${user.initials}
+                            ${user.is_online ? '<div style="width: 12px; height: 12px; background-color: #25d366; border-radius: 50%; border: 2px solid white; position: absolute; bottom: 0; right: 0;"></div>' : ''}
                         </div>
                         <div>
                             <div style="font-weight: 500;">${user.full_name}</div>
-                            <div style="font-size: 14px; color: #667781;">@${user.username}</div>
+                            <div style="font-size: 14px; color: #667781;">@${user.username} ${user.is_online ? '• Online' : ''}</div>
                         </div>
                     `;
                     userDiv.addEventListener('mouseenter', () => userDiv.style.backgroundColor = '#f5f6f6');

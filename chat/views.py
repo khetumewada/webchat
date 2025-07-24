@@ -1,15 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.db.models import Q, Max
 from django.utils import timezone
+from django.contrib import messages
 from .models import Chat, Message, UserProfile, MessageRead
 import json
 
 def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('chat_home')
+        
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -20,10 +24,32 @@ def register_view(request):
             password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
             login(request, user)
+            messages.success(request, f'Welcome to WebChat, {username}!')
             return redirect('chat_home')
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('chat_home')
+    # Django's built-in LoginView will handle this
+    pass
+
+@login_required
+def logout_view(request):
+    # Update user offline status before logout
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        profile.is_online = False
+        profile.last_seen = timezone.now()
+        profile.save()
+    except UserProfile.DoesNotExist:
+        pass
+    
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('login')
 
 @login_required
 def chat_home(request):
@@ -38,7 +64,7 @@ def chat_home(request):
         last_message_time=Max('messages__timestamp')
     ).order_by('-last_message_time')
     
-    # Get all users for starting new chats
+    # Get all users for starting new chats (exclude current user)
     all_users = User.objects.exclude(id=request.user.id)
     
     context = {
@@ -71,6 +97,11 @@ def chat_room(request, chat_id):
 def start_chat(request, user_id):
     other_user = get_object_or_404(User, id=user_id)
     
+    # Prevent users from starting chat with themselves
+    if other_user == request.user:
+        messages.error(request, "You cannot start a chat with yourself.")
+        return redirect('chat_home')
+    
     # Check if chat already exists
     existing_chat = Chat.objects.filter(
         chat_type='private',
@@ -84,6 +115,7 @@ def start_chat(request, user_id):
     chat = Chat.objects.create(chat_type='private')
     chat.participants.add(request.user, other_user)
     
+    messages.success(request, f'Started new conversation with {other_user.get_full_name() or other_user.username}')
     return redirect('chat_room', chat_id=chat.id)
 
 @login_required
@@ -111,7 +143,7 @@ def search_users(request):
             Q(username__icontains=query) | 
             Q(first_name__icontains=query) | 
             Q(last_name__icontains=query)
-        ).exclude(id=request.user.id)[:10]
+        ).exclude(id=request.user.id)[:10]  # Exclude current user
         
         users_data = []
         for user in users:
@@ -127,3 +159,9 @@ def search_users(request):
         return JsonResponse({'users': users_data})
     
     return JsonResponse({'users': []})
+
+# Public view for non-authenticated users
+def welcome_view(request):
+    if request.user.is_authenticated:
+        return redirect('chat_home')
+    return render(request, 'chat/welcome.html')

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to WebChat{% endblock %}
+
+{% block content %}
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #25d366, #128c7e);">
+    <div style="background: white; padding: 60px 40px; border-radius: 15px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); text-align: center; max-width: 500px; width: 90%;">
+        <div style="width: 100px; height: 100px; background: linear-gradient(45deg, #25d366, #128c7e); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; margin: 0 auto 30px;">💬</div>
+        
+        <h1 style="font-size: 36px; color: #333; margin-bottom: 15px; font-weight: 300;">WebChat</h1>
+        <p style="font-size: 18px; color: #666; margin-bottom: 40px; line-height: 1.6;">
+            Connect with friends and family through secure, real-time messaging. 
+            Experience seamless communication with our WhatsApp-inspired interface.
+        </p>
+        
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'register' %}" style="background-color: #25d366; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 16px; transition: background-color 0.3s;">
+                Get Started
+            </a>
+            <a href="{% url 'login' %}" style="background-color: transparent; color: #25d366; padding: 15px 30px; border: 2px solid #25d366; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 16px; transition: all 0.3s;">
+                Sign In
+            </a>
+        </div>
+        
+        <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #eee;">
+            <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;">Features</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: left;">
+                <div>
+                    <div style="color: #25d366; font-size: 24px; margin-bottom: 10px;">⚡</div>
+                    <h4 style="color: #333; margin-bottom: 5px;">Real-time Messaging</h4>
+                    <p style="color: #666; font-size: 14px;">Instant message delivery with WebSocket technology</p>
+                </div>
+                <div>
+                    <div style="color: #25d366; font-size: 24px; margin-bottom: 10px;">🔒</div>
+                    <h4 style="color: #333; margin-bottom: 5px;">Secure & Private</h4>
+                    <p style="color: #666; font-size: 14px;">Your conversations are protected and private</p>
+                </div>
+                <div>
+                    <div style="color: #25d366; font-size: 24px; margin-bottom: 10px;">📱</div>
+                    <h4 style="color: #333; margin-bottom: 5px;">Mobile Friendly</h4>
+                    <p style="color: #666; font-size: 14px;">Works perfectly on all devices and screen sizes</p>
+                </div>
+                <div>
+                    <div style="color: #25d366; font-size: 24px; margin-bottom: 10px;">👥</div>
+                    <h4 style="color: #333; margin-bottom: 5px;">Easy to Use</h4>
+                    <p style="color: #666; font-size: 14px;">Familiar WhatsApp-like interface</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+}
+</style>
+{% endblock %}
