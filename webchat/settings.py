@@ -17,7 +17,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
-    'chat',
+    'accounts',
+    'chatapp',
 ]
 
 MIDDLEWARE = [
@@ -96,9 +97,9 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication settings
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/home/'
-LOGOUT_REDIRECT_URL = '/welcome/'
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/welcome/'
 
 # Messages framework
 from django.contrib.messages import constants as messages
@@ -120,7 +121,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'chat.consumers': {
+        'chatapp.consumers': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,

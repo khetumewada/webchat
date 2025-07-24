@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load chat_extras %}
+{% load chatapp.templatetags %}
 
 {% block title %}Chat - WebChat{% endblock %}
 
@@ -11,81 +11,65 @@
         flex-direction: column;
         background: linear-gradient(135deg, #efeae2 0%, #f5f1ec 100%);
         background-image: 
-            radial-gradient(circle at 20% 50%, rgba(0, 168, 132, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(37, 211, 102, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 40% 80%, rgba(102, 126, 234, 0.03) 0%, transparent 50%);
+            radial-gradient(circle at 20% 50%, rgba(0, 168, 132, 0.02) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(37, 211, 102, 0.02) 0%, transparent 50%);
     }
 
     .chat-header {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        padding: 20px 25px;
+        padding: 16px 20px;
         color: white;
         display: flex;
         align-items: center;
-        gap: 20px;
-        box-shadow: 0 4px 20px rgba(0, 168, 132, 0.2);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .chat-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-        pointer-events: none;
+        gap: 16px;
+        box-shadow: 0 2px 8px rgba(0, 168, 132, 0.2);
     }
 
     .chat-user-info {
         flex: 1;
-        z-index: 1;
     }
 
     .chat-user-name {
         font-weight: 600;
         color: white;
-        margin-bottom: 4px;
-        font-size: 18px;
+        margin-bottom: 2px;
+        font-size: 16px;
     }
 
     .chat-user-status {
-        font-size: 14px;
+        font-size: 12px;
         color: rgba(255,255,255,0.8);
         font-weight: 500;
     }
 
     .chat-actions {
         display: flex;
-        gap: 10px;
-        z-index: 1;
+        gap: 8px;
     }
 
     .messages-container {
         flex: 1;
         overflow-y: auto;
-        padding: 25px;
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
     }
 
     .message {
-        max-width: 70%;
-        padding: 12px 16px;
-        border-radius: 18px;
+        max-width: 65%;
+        padding: 10px 14px;
+        border-radius: 16px;
         position: relative;
         word-wrap: break-word;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         animation: messageSlide 0.3s ease-out;
     }
 
     @keyframes messageSlide {
         from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(8px);
         }
         to {
             opacity: 1;
@@ -97,26 +81,26 @@
         align-self: flex-end;
         background: linear-gradient(135deg, var(--message-sent), #c8f7c5);
         margin-left: auto;
-        border-bottom-right-radius: 6px;
+        border-bottom-right-radius: 4px;
     }
 
     .message.received {
         align-self: flex-start;
         background: var(--message-received);
         margin-right: auto;
-        border-bottom-left-radius: 6px;
-        border: 1px solid rgba(0,0,0,0.05);
+        border-bottom-left-radius: 4px;
+        border: 1px solid rgba(0,0,0,0.04);
     }
 
     .message-text {
-        margin-bottom: 8px;
-        line-height: 1.5;
-        font-size: 15px;
+        margin-bottom: 6px;
+        line-height: 1.4;
+        font-size: 14px;
         color: var(--text-primary);
     }
 
     .message-time {
-        font-size: 11px;
+        font-size: 10px;
         color: var(--text-secondary);
         text-align: right;
         font-weight: 500;
@@ -125,21 +109,21 @@
 
     .message-input-container {
         background: white;
-        padding: 20px 25px;
+        padding: 16px 20px;
         display: flex;
         align-items: center;
-        gap: 15px;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        gap: 12px;
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
         border-top: 1px solid var(--border-color);
     }
 
     .message-input {
         flex: 1;
-        padding: 14px 20px;
-        border: 2px solid var(--border-color);
-        border-radius: 25px;
+        padding: 12px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
         outline: none;
-        font-size: 15px;
+        font-size: 14px;
         background: var(--background-color);
         transition: var(--transition);
         font-family: inherit;
@@ -148,29 +132,40 @@
     .message-input:focus {
         border-color: var(--primary-color);
         background: white;
-        box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.1);
+        box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.1);
     }
 
     .send-btn {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         border: none;
         border-radius: 50%;
-        width: 50px;
-        height: 50px;
+        width: 44px;
+        height: 44px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         cursor: pointer;
-        font-size: 16px;
-        font-weight: 600;
+        font-size: 18px;
         transition: var(--transition);
-        box-shadow: 0 4px 15px rgba(0, 168, 132, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 168, 132, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .send-btn::before {
+        content: '→';
+        font-weight: bold;
+        transition: var(--transition);
     }
 
     .send-btn:hover {
         transform: scale(1.05);
-        box-shadow: 0 6px 20px rgba(0, 168, 132, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 168, 132, 0.4);
+    }
+
+    .send-btn:hover::before {
+        transform: translateX(2px);
     }
 
     .send-btn:disabled {
@@ -180,20 +175,31 @@
         box-shadow: none;
     }
 
+    .send-btn:disabled::before {
+        content: '⋯';
+        animation: loading 1s infinite;
+    }
+
+    @keyframes loading {
+        0%, 20% { opacity: 0.2; }
+        50% { opacity: 1; }
+        100% { opacity: 0.2; }
+    }
+
     .typing-indicator {
-        padding: 15px 25px;
+        padding: 12px 20px;
         font-style: italic;
         color: var(--text-secondary);
-        font-size: 14px;
+        font-size: 12px;
         background: rgba(255,255,255,0.8);
-        margin: 0 25px;
-        border-radius: 12px;
+        margin: 0 20px;
+        border-radius: 8px;
         animation: pulse 1.5s infinite;
     }
 
     .connection-status {
-        padding: 8px 15px;
-        font-size: 12px;
+        padding: 6px 12px;
+        font-size: 11px;
         text-align: center;
         color: white;
         font-weight: 600;
@@ -213,9 +219,8 @@
     }
 
     .contact-item.active {
-        background: linear-gradient(90deg, rgba(0, 168, 132, 0.15) 0%, rgba(0, 168, 132, 0.08) 100%);
-        border-left: 4px solid var(--primary-color);
-        transform: translateX(2px);
+        background: rgba(0, 168, 132, 0.1);
+        border-left: 3px solid var(--primary-color);
     }
 
     @media (max-width: 768px) {
@@ -224,15 +229,15 @@
         }
         
         .message {
-            max-width: 85%;
+            max-width: 80%;
         }
         
         .messages-container {
-            padding: 20px 15px;
+            padding: 16px 12px;
         }
         
         .message-input-container {
-            padding: 15px;
+            padding: 12px;
         }
     }
 </style>
@@ -251,11 +256,11 @@
                         {{ current_user.username|slice:":2"|upper }}
                     {% endif %}
                 </div>
-                <span style="font-weight: 600; color: white;">{{ current_user.get_full_name|default:current_user.username }}</span>
+                <span style="font-weight: 600; color: white; font-size: 14px;">{{ current_user.get_full_name|default:current_user.username }}</span>
             </div>
             <div class="header-actions">
-                <a href="{% url 'chat_home' %}" class="action-btn" title="Home">🏠</a>
-                <a href="{% url 'logout' %}" class="action-btn" title="Logout">🚪</a>
+                <a href="{% url 'chatapp:home' %}" class="action-btn" title="Home">🏠</a>
+                <a href="{% url 'accounts:logout' %}" class="action-btn" title="Logout">🚪</a>
             </div>
         </div>
 
@@ -268,7 +273,7 @@
                 {% if chat_item.chat_type == 'private' %}
                     {% with other_user=chat_item|get_other_participant:current_user %}
                         {% if other_user %}
-                            <a href="{% url 'chat_room' chat_item.id %}" class="contact-item {% if chat_item.id == active_chat_id %}active{% endif %}">
+                            <a href="{% url 'chatapp:room' chat_item.id %}" class="contact-item {% if chat_item.id == active_chat_id %}active{% endif %}">
                                 <div class="contact-avatar" style="background: {{ other_user.id|get_avatar_color }}; position: relative;">
                                     {% if other_user.userprofile %}
                                         {{ other_user.userprofile.get_avatar_initials }}
@@ -285,9 +290,9 @@
                                         {% with last_message=chat_item.get_last_message %}
                                             {% if last_message %}
                                                 {% if last_message.sender == current_user %}
-                                                    You: {{ last_message.content|truncatechars:25 }}
+                                                    You: {{ last_message.content|truncatechars:20 }}
                                                 {% else %}
-                                                    {{ last_message.content|truncatechars:30 }}
+                                                    {{ last_message.content|truncatechars:25 }}
                                                 {% endif %}
                                             {% else %}
                                                 No messages yet
@@ -319,7 +324,7 @@
             {% if chat.chat_type == 'private' %}
                 {% with other_user=chat|get_other_participant:current_user %}
                     {% if other_user %}
-                        <div class="contact-avatar" style="background: {{ other_user.id|get_avatar_color }}; position: relative; z-index: 1;">
+                        <div class="contact-avatar" style="background: {{ other_user.id|get_avatar_color }}; position: relative;">
                             {% if other_user.userprofile %}
                                 {{ other_user.userprofile.get_avatar_initials }}
                                 {% if other_user.userprofile.is_online %}
@@ -361,7 +366,7 @@
 
         <div class="message-input-container">
             <input type="text" class="message-input" placeholder="Type a message..." id="messageInput">
-            <button class="send-btn" id="sendBtn">Send</button>
+            <button class="send-btn" id="sendBtn" title="Send message"></button>
         </div>
     </div>
 </div>

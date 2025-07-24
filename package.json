@@ -1,8 +1,12 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "webchat",
+  "version": "1.0.0",
+  "description": "Clean & Modern Django Chat Application",
   "private": true,
   "scripts": {
-    "build": "echo 'no build script'"
-  }
+    "setup": "python setup.py",
+    "dev": "python manage.py runserver"
+  },
+  "keywords": ["django", "chat", "websocket", "real-time"],
+  "license": "MIT"
 }

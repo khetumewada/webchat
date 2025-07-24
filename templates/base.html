@@ -19,11 +19,11 @@
             --text-secondary: #667781;
             --border-color: #e9edef;
             --hover-color: #f5f6f6;
-            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-            --border-radius: 12px;
-            --border-radius-sm: 8px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --border-radius-sm: 6px;
+            --transition: all 0.2s ease;
         }
 
         * {
@@ -37,13 +37,14 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: var(--text-primary);
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 14px;
         }
 
         .chat-container {
             display: flex;
             height: 100vh;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             background: var(--sidebar-bg);
             box-shadow: var(--shadow-lg);
@@ -53,46 +54,31 @@
 
         /* Sidebar Styles */
         .contacts-sidebar {
-            width: 380px;
+            width: 320px;
             background: var(--sidebar-bg);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            position: relative;
         }
 
         .sidebar-header {
             background: var(--primary-color);
-            padding: 20px;
+            padding: 16px 20px;
             color: white;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sidebar-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-            pointer-events: none;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 15px;
-            z-index: 1;
+            gap: 12px;
         }
 
         .profile-pic {
-            width: 45px;
-            height: 45px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(135deg, #667eea, #764ba2);
             display: flex;
@@ -100,26 +86,20 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: var(--transition);
-        }
-
-        .profile-pic:hover {
-            transform: scale(1.05);
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .header-actions {
             display: flex;
-            gap: 10px;
-            z-index: 1;
+            gap: 8px;
         }
 
         .action-btn {
             background: rgba(255,255,255,0.2);
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             color: white;
             cursor: pointer;
@@ -127,28 +107,28 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            backdrop-filter: blur(10px);
+            font-size: 14px;
+            text-decoration: none;
         }
 
         .action-btn:hover {
             background: rgba(255,255,255,0.3);
-            transform: scale(1.1);
         }
 
         .search-container {
-            padding: 20px;
+            padding: 16px;
             background: var(--sidebar-bg);
             border-bottom: 1px solid var(--border-color);
         }
 
         .search-box {
             width: 100%;
-            padding: 12px 20px;
-            border: 2px solid var(--border-color);
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
             background: var(--background-color);
-            border-radius: 25px;
+            border-radius: 20px;
             outline: none;
-            font-size: 14px;
+            font-size: 13px;
             transition: var(--transition);
             font-family: inherit;
         }
@@ -156,7 +136,7 @@
         .search-box:focus {
             border-color: var(--primary-color);
             background: white;
-            box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.1);
+            box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.1);
         }
 
         .contacts-list {
@@ -168,43 +148,36 @@
         .contact-item {
             display: flex;
             align-items: center;
-            padding: 16px 20px;
+            padding: 12px 16px;
             cursor: pointer;
             border-bottom: 1px solid rgba(233, 237, 239, 0.5);
             transition: var(--transition);
             text-decoration: none;
             color: inherit;
-            position: relative;
         }
 
         .contact-item:hover {
             background: var(--hover-color);
-            transform: translateX(2px);
         }
 
         .contact-item.active {
-            background: linear-gradient(90deg, rgba(0, 168, 132, 0.1) 0%, rgba(0, 168, 132, 0.05) 100%);
-            border-left: 4px solid var(--primary-color);
+            background: rgba(0, 168, 132, 0.1);
+            border-left: 3px solid var(--primary-color);
         }
 
         .contact-avatar {
-            width: 55px;
-            height: 55px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            margin-right: 15px;
+            margin-right: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 20px;
+            font-size: 16px;
             position: relative;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: var(--transition);
-        }
-
-        .contact-item:hover .contact-avatar {
-            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .contact-info {
@@ -215,12 +188,12 @@
         .contact-name {
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 4px;
-            font-size: 16px;
+            margin-bottom: 2px;
+            font-size: 14px;
         }
 
         .contact-last-message {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
             white-space: nowrap;
             overflow: hidden;
@@ -231,11 +204,11 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 8px;
+            gap: 4px;
         }
 
         .message-time {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             font-weight: 500;
         }
@@ -244,32 +217,24 @@
             background: var(--primary-color);
             color: white;
             border-radius: 50%;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
         }
 
         .online-indicator {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             background: var(--secondary-color);
             border-radius: 50%;
-            border: 3px solid white;
+            border: 2px solid white;
             position: absolute;
-            bottom: 2px;
-            right: 2px;
-            animation: pulse 2s infinite;
+            bottom: 0;
+            right: 0;
         }
 
         /* Auth Styles */
@@ -284,13 +249,12 @@
 
         .auth-form {
             background: white;
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             width: 100%;
-            max-width: 450px;
+            max-width: 400px;
             position: relative;
-            overflow: hidden;
         }
 
         .auth-form::before {
@@ -299,87 +263,70 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 5px;
+            height: 4px;
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px 12px 0 0;
         }
 
         .auth-form h2 {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             color: var(--text-primary);
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
         }
 
         .form-group {
-            margin-bottom: 25px;
-            position: relative;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-primary);
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .form-group input {
+        .form-input {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid var(--border-color);
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
             border-radius: var(--border-radius-sm);
-            font-size: 16px;
+            font-size: 14px;
             outline: none;
             transition: var(--transition);
             font-family: inherit;
             background: var(--background-color);
         }
 
-        .form-group input:focus {
+        .form-input:focus {
             border-color: var(--primary-color);
             background: white;
-            box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.1);
+            box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.1);
         }
 
         .btn-primary {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
             border-radius: var(--border-radius-sm);
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 168, 132, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 168, 132, 0.3);
         }
 
         .auth-links {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 24px;
         }
 
         .auth-links a {
@@ -391,7 +338,6 @@
 
         .auth-links a:hover {
             color: var(--primary-dark);
-            text-decoration: underline;
         }
 
         /* Responsive Design */
@@ -421,14 +367,14 @@
             }
 
             .auth-form {
-                padding: 30px;
+                padding: 32px 24px;
                 margin: 10px;
             }
         }
 
         /* Scrollbar Styling */
         .contacts-list::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         .contacts-list::-webkit-scrollbar-track {
@@ -437,48 +383,32 @@
 
         .contacts-list::-webkit-scrollbar-thumb {
             background: rgba(0, 168, 132, 0.3);
-            border-radius: 3px;
+            border-radius: 2px;
         }
 
         .contacts-list::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 168, 132, 0.5);
         }
 
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Error Messages */
+        /* Error/Success Messages */
         .error-message {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
-            padding: 15px;
+            padding: 12px 16px;
             border-radius: var(--border-radius-sm);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-weight: 500;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+            font-size: 13px;
         }
 
-        /* Success Messages */
         .success-message {
             background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
             color: white;
-            padding: 15px;
+            padding: 12px 16px;
             border-radius: var(--border-radius-sm);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-weight: 500;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            font-size: 13px;
         }
     </style>
     {% block extra_css %}{% endblock %}

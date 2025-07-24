@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load chat_extras %}
+{% load chatapp.templatetags %}
 
 {% block title %}WebChat - Home{% endblock %}
 
@@ -17,8 +17,8 @@
                     {% endif %}
                 </div>
                 <div>
-                    <div style="font-weight: 600; font-size: 16px; color: white;">{{ current_user.get_full_name|default:current_user.username }}</div>
-                    <div style="font-size: 13px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>
+                    <div style="font-weight: 600; font-size: 14px; color: white;">{{ current_user.get_full_name|default:current_user.username }}</div>
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>
                 </div>
             </div>
             <div class="header-actions">
@@ -27,19 +27,19 @@
         </div>
 
         <!-- User Menu Dropdown -->
-        <div id="userMenu" style="display: none; position: absolute; top: 85px; right: 20px; background: white; border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 1000; min-width: 220px; overflow: hidden;">
-            <div style="padding: 20px; border-bottom: 1px solid var(--border-color); background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
-                <div style="font-weight: 600; color: white;">{{ current_user.get_full_name|default:current_user.username }}</div>
-                <div style="font-size: 13px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>
+        <div id="userMenu" style="display: none; position: absolute; top: 68px; right: 16px; background: white; border: none; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 1000; min-width: 180px; overflow: hidden;">
+            <div style="padding: 16px; border-bottom: 1px solid var(--border-color); background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+                <div style="font-weight: 600; color: white; font-size: 13px;">{{ current_user.get_full_name|default:current_user.username }}</div>
+                <div style="font-size: 11px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>
             </div>
-            <div style="padding: 10px 0;">
-                <a href="{% url 'profile' %}" style="display: flex; align-items: center; padding: 15px 20px; color: var(--text-primary); text-decoration: none; font-size: 14px; font-weight: 500; transition: var(--transition);" onmouseover="this.style.backgroundColor='var(--hover-color)'" onmouseout="this.style.backgroundColor='transparent'">
-                    <span style="margin-right: 12px; font-size: 16px;">👤</span>
+            <div style="padding: 8px 0;">
+                <a href="{% url 'accounts:profile' %}" style="display: flex; align-items: center; padding: 12px 16px; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 500; transition: var(--transition);" onmouseover="this.style.backgroundColor='var(--hover-color)'" onmouseout="this.style.backgroundColor='transparent'">
+                    <span style="margin-right: 10px; font-size: 14px;">👤</span>
                     Profile Settings
                 </a>
-                <div style="border-top: 1px solid var(--border-color); margin: 8px 0;"></div>
-                <a href="{% url 'logout' %}" style="display: flex; align-items: center; padding: 15px 20px; color: #d32f2f; text-decoration: none; font-size: 14px; font-weight: 500; transition: var(--transition);" onmouseover="this.style.backgroundColor='#ffebee'" onmouseout="this.style.backgroundColor='transparent'">
-                    <span style="margin-right: 12px; font-size: 16px;">🚪</span>
+                <div style="border-top: 1px solid var(--border-color); margin: 6px 0;"></div>
+                <a href="{% url 'accounts:logout' %}" style="display: flex; align-items: center; padding: 12px 16px; color: #d32f2f; text-decoration: none; font-size: 13px; font-weight: 500; transition: var(--transition);" onmouseover="this.style.backgroundColor='#ffebee'" onmouseout="this.style.backgroundColor='transparent'">
+                    <span style="margin-right: 10px; font-size: 14px;">🚪</span>
                     Logout
                 </a>
             </div>
@@ -49,7 +49,7 @@
         <div class="search-container">
             <div style="position: relative;">
                 <input type="text" class="search-box" placeholder="Search users to chat..." id="searchInput">
-                <div id="searchResults" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid var(--primary-color); border-top: none; border-radius: 0 0 12px 12px; max-height: 350px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.12);"></div>
+                <div id="searchResults" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--primary-color); border-top: none; border-radius: 0 0 8px 8px; max-height: 280px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.1);"></div>
             </div>
         </div>
 
@@ -58,7 +58,7 @@
                 {% if chat.chat_type == 'private' %}
                     {% with other_user=chat|get_other_participant:current_user %}
                         {% if other_user %}
-                            <a href="{% url 'chat_room' chat.id %}" class="contact-item">
+                            <a href="{% url 'chatapp:room' chat.id %}" class="contact-item">
                                 <div class="contact-avatar" style="background: {{ other_user.id|get_avatar_color }}; position: relative;">
                                     {% if other_user.userprofile %}
                                         {{ other_user.userprofile.get_avatar_initials }}
@@ -75,9 +75,9 @@
                                         {% with last_message=chat.get_last_message %}
                                             {% if last_message %}
                                                 {% if last_message.sender == current_user %}
-                                                    You: {{ last_message.content|truncatechars:35 }}
+                                                    You: {{ last_message.content|truncatechars:30 }}
                                                 {% else %}
-                                                    {{ last_message.content|truncatechars:40 }}
+                                                    {{ last_message.content|truncatechars:35 }}
                                                 {% endif %}
                                             {% else %}
                                                 Start a conversation...
@@ -97,45 +97,41 @@
                     {% endwith %}
                 {% endif %}
             {% empty %}
-                <div style="padding: 60px 30px; text-align: center; color: var(--text-secondary);">
-                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; margin: 0 auto 25px; opacity: 0.8;">💬</div>
-                    <h3 style="margin-bottom: 15px; color: var(--text-primary); font-weight: 600;">No conversations yet</h3>
-                    <p style="line-height: 1.6; font-size: 14px;">Search for users above to start your first conversation and connect with others.</p>
+                <div style="padding: 48px 24px; text-align: center; color: var(--text-secondary);">
+                    <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 20px; opacity: 0.8;">💬</div>
+                    <h3 style="margin-bottom: 12px; color: var(--text-primary); font-weight: 600; font-size: 16px;">No conversations yet</h3>
+                    <p style="line-height: 1.5; font-size: 12px;">Search for users above to start your first conversation.</p>
                 </div>
             {% endfor %}
         </div>
     </div>
 
     <!-- Right Side - Welcome Screen -->
-    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); text-align: center; padding: 60px; position: relative; overflow: hidden;">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); text-align: center; padding: 48px;">
         
-        <!-- Decorative background elements -->
-        <div style="position: absolute; top: 10%; right: 10%; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(0, 168, 132, 0.1), rgba(37, 211, 102, 0.1)); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
-        <div style="position: absolute; bottom: 20%; left: 15%; width: 60px; height: 60px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border-radius: 50%; animation: float 4s ease-in-out infinite reverse;"></div>
+        <div style="width: 96px; height: 96px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; margin-bottom: 32px; box-shadow: 0 8px 24px rgba(0, 168, 132, 0.3);">💬</div>
         
-        <div style="width: 140px; height: 140px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 56px; color: white; margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0, 168, 132, 0.3); animation: pulse 3s infinite;">💬</div>
+        <h1 style="font-size: 28px; color: var(--text-primary); margin-bottom: 16px; font-weight: 700;">Welcome to WebChat</h1>
         
-        <h1 style="font-size: 36px; color: var(--text-primary); margin-bottom: 20px; font-weight: 700;">Welcome to WebChat</h1>
-        
-        <p style="font-size: 18px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 40px; max-width: 500px;">
-            Send and receive messages in real-time with a beautiful, modern interface.<br>
+        <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; max-width: 400px;">
+            Send and receive messages in real-time with a modern interface.<br>
             <strong>Search for users above</strong> to start a conversation.
         </p>
         
-        <div style="background: white; padding: 30px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); max-width: 400px;">
-            <h3 style="color: var(--text-primary); margin-bottom: 20px; font-weight: 600;">Quick Tips</h3>
-            <div style="text-align: left; space-y: 15px;">
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <span style="width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%; margin-right: 12px;"></span>
-                    <span style="color: var(--text-secondary); font-size: 14px;">Use the search bar to find users</span>
+        <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); max-width: 320px;">
+            <h3 style="color: var(--text-primary); margin-bottom: 16px; font-weight: 600; font-size: 14px;">Quick Tips</h3>
+            <div style="text-align: left;">
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <span style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-right: 10px;"></span>
+                    <span style="color: var(--text-secondary); font-size: 12px;">Use the search bar to find users</span>
                 </div>
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <span style="width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%; margin-right: 12px;"></span>
-                    <span style="color: var(--text-secondary); font-size: 14px;">Click on a user to start chatting</span>
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <span style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-right: 10px;"></span>
+                    <span style="color: var(--text-secondary); font-size: 12px;">Click on a user to start chatting</span>
                 </div>
                 <div style="display: flex; align-items: center;">
-                    <span style="width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%; margin-right: 12px;"></span>
-                    <span style="color: var(--text-secondary); font-size: 14px;">Messages are delivered instantly</span>
+                    <span style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-right: 10px;"></span>
+                    <span style="color: var(--text-secondary); font-size: 12px;">Messages are delivered instantly</span>
                 </div>
             </div>
         </div>
@@ -144,16 +140,16 @@
 
 <!-- Messages Display -->
 {% if messages %}
-    <div id="messagesContainer" style="position: fixed; top: 30px; right: 30px; z-index: 1001; max-width: 400px;">
+    <div id="messagesContainer" style="position: fixed; top: 24px; right: 24px; z-index: 1001; max-width: 320px;">
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}" style="background: {% if message.tags == 'success' %}linear-gradient(135deg, var(--secondary-color), var(--primary-color)){% elif message.tags == 'error' %}linear-gradient(135deg, #ff6b6b, #ee5a24){% else %}linear-gradient(135deg, #74b9ff, #0984e3){% endif %}; color: white; padding: 16px 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); font-weight: 500; animation: slideIn 0.5s ease-out;">
+            <div class="alert alert-{{ message.tags }}" style="background: {% if message.tags == 'success' %}linear-gradient(135deg, var(--secondary-color), var(--primary-color)){% elif message.tags == 'error' %}linear-gradient(135deg, #ff6b6b, #ee5a24){% else %}linear-gradient(135deg, #74b9ff, #0984e3){% endif %}; color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: endif%}; color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; font-size: 13px; animation: slideIn 0.4s ease-out;">
                 {{ message }}
             </div>
         {% endfor %}
     </div>
     <style>
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(100px); }
+            from { opacity: 0; transform: translateX(80px); }
             to { opacity: 1; transform: translateX(0); }
         }
     </style>
@@ -162,10 +158,10 @@
             const container = document.getElementById('messagesContainer');
             if (container) {
                 container.style.opacity = '0';
-                container.style.transition = 'opacity 0.5s';
-                setTimeout(() => container.remove(), 500);
+                container.style.transition = 'opacity 0.4s';
+                setTimeout(() => container.remove(), 400);
             }
-        }, 5000);
+        }, 4000);
     </script>
 {% endif %}
 {% endblock %}
@@ -201,7 +197,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
                 if (data.users.length > 0) {
                     data.users.forEach(user => {
                         const userDiv = document.createElement('div');
-                        userDiv.style.cssText = 'display: flex; align-items: center; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); transition: var(--transition);';
+                        userDiv.style.cssText = 'display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border-color); transition: var(--transition);';
                         
                         const colors = [
                             "linear-gradient(135deg, #ff6b6b, #ee5a24)",
@@ -216,23 +212,21 @@ document.getElementById('searchInput').addEventListener('input', function() {
                         const avatarColor = colors[user.id % colors.length];
                         
                         userDiv.innerHTML = `
-                            <div style="width: 45px; height: 45px; border-radius: 50%; background: ${avatarColor}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 15px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: ${avatarColor}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 14px;">
                                 ${user.initials}
-                                ${user.is_online ? '<div style="width: 14px; height: 14px; background-color: var(--secondary-color); border-radius: 50%; border: 3px solid white; position: absolute; bottom: 0; right: 0; animation: pulse 2s infinite;"></div>' : ''}
+                                ${user.is_online ? '<div style="width: 12px; height: 12px; background-color: var(--secondary-color); border-radius: 50%; border: 2px solid white; position: absolute; bottom: 0; right: 0;"></div>' : ''}
                             </div>
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">${user.full_name}</div>
-                                <div style="font-size: 13px; color: var(--text-secondary);">@${user.username} ${user.is_online ? '• <span style="color: var(--secondary-color);">Online</span>' : ''}</div>
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px; font-size: 13px;">${user.full_name}</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">@${user.username} ${user.is_online ? '• <span style="color: var(--secondary-color);">Online</span>' : ''}</div>
                             </div>
                         `;
                         
                         userDiv.addEventListener('mouseenter', () => {
                             userDiv.style.backgroundColor = 'var(--hover-color)';
-                            userDiv.style.transform = 'translateX(4px)';
                         });
                         userDiv.addEventListener('mouseleave', () => {
                             userDiv.style.backgroundColor = 'transparent';
-                            userDiv.style.transform = 'translateX(0)';
                         });
                         userDiv.addEventListener('click', () => {
                             window.location.href = `/start-chat/${user.id}/`;
@@ -242,7 +236,7 @@ document.getElementById('searchInput').addEventListener('input', function() {
                     });
                     resultsDiv.style.display = 'block';
                 } else {
-                    resultsDiv.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--text-secondary);">No users found</div>';
+                    resultsDiv.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 12px;">No users found</div>';
                     resultsDiv.style.display = 'block';
                 }
             });

@@ -1,10 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, Chat, Message, MessageRead
-
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'is_online', 'last_seen']
-    list_filter = ['is_online', 'last_seen']
+from .models import Chat, Message, MessageRead
 
 @admin.register(Chat)
 class ChatAdmin(admin.ModelAdmin):
