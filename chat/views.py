@@ -8,6 +8,7 @@ from django.db.models import Q, Max
 from django.utils import timezone
 from django.contrib import messages
 from .models import Chat, Message, UserProfile, MessageRead
+from .forms import UserProfileForm
 import json
 
 def root_view(request):
@@ -36,12 +37,6 @@ def register_view(request):
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('chat_home')
-    # Django's built-in LoginView will handle this
-    pass
-
 @login_required
 def logout_view(request):
     # Update user offline status before logout
@@ -58,6 +53,28 @@ def logout_view(request):
     return redirect('welcome')
 
 @login_required
+def profile_view(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=profile, user=request.user)
+        if form.is_valid():
+            # Update user fields
+            request.user.first_name = form.cleaned_data['first_name']
+            request.user.last_name = form.cleaned_data['last_name']
+            request.user.email = form.cleaned_data['email']
+            request.user.save()
+            
+            # Update profile
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=profile, user=request.user)
+    
+    return render(request, 'chat/profile.html', {'form': form, 'profile': profile})
+
+@login_required
 def chat_home(request):
     # Update user online status
     profile, created = UserProfile.objects.get_or_create(user=request.user)
@@ -70,12 +87,8 @@ def chat_home(request):
         last_message_time=Max('messages__timestamp')
     ).order_by('-last_message_time')
     
-    # Get all users for starting new chats (exclude current user)
-    all_users = User.objects.exclude(id=request.user.id)
-    
     context = {
         'chats': user_chats,
-        'all_users': all_users,
         'current_user': request.user,
     }
     return render(request, 'chat/home.html', context)
@@ -83,19 +96,26 @@ def chat_home(request):
 @login_required
 def chat_room(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id, participants=request.user)
-    messages = chat.messages.all().order_by('timestamp')
+    messages_list = chat.messages.all().order_by('timestamp')
     
     # Mark messages as read
-    unread_messages = messages.exclude(sender=request.user).exclude(
+    unread_messages = messages_list.exclude(sender=request.user).exclude(
         read_by__user=request.user
     )
     for message in unread_messages:
         MessageRead.objects.get_or_create(message=message, user=request.user)
     
+    # Get user's chats for sidebar
+    user_chats = Chat.objects.filter(participants=request.user).annotate(
+        last_message_time=Max('messages__timestamp')
+    ).order_by('-last_message_time')
+    
     context = {
         'chat': chat,
-        'messages': messages,
+        'messages': messages_list,
         'current_user': request.user,
+        'chats': user_chats,
+        'active_chat_id': chat_id,
     }
     return render(request, 'chat/room.html', context)
 
@@ -127,10 +147,10 @@ def start_chat(request, user_id):
 @login_required
 def get_chat_messages(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id, participants=request.user)
-    messages = chat.messages.all().order_by('timestamp')
+    messages_list = chat.messages.all().order_by('timestamp')
     
     messages_data = []
-    for message in messages:
+    for message in messages_list:
         messages_data.append({
             'id': message.id,
             'sender': message.sender.username,
@@ -149,7 +169,7 @@ def search_users(request):
             Q(username__icontains=query) | 
             Q(first_name__icontains=query) | 
             Q(last_name__icontains=query)
-        ).exclude(id=request.user.id)[:10]  # Exclude current user
+        ).exclude(id=request.user.id)[:10]
         
         users_data = []
         for user in users:
@@ -166,7 +186,6 @@ def search_users(request):
     
     return JsonResponse({'users': []})
 
-# Public view for non-authenticated users
 def welcome_view(request):
     if request.user.is_authenticated:
         return redirect('chat_home')

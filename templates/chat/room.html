@@ -90,11 +90,6 @@
         gap: 15px;
     }
 
-    .input-actions {
-        display: flex;
-        gap: 10px;
-    }
-
     .message-input {
         flex: 1;
         padding: 10px 15px;
@@ -136,17 +131,6 @@
         font-size: 14px;
     }
 
-    .back-btn {
-        display: none;
-        background: none;
-        border: none;
-        font-size: 20px;
-        color: #54656f;
-        cursor: pointer;
-        padding: 5px;
-        margin-right: 10px;
-    }
-
     .connection-status {
         padding: 5px 10px;
         font-size: 12px;
@@ -166,9 +150,13 @@
         background-color: #ff9800;
     }
 
+    .contact-item.active {
+        background-color: #e7f3ff;
+    }
+
     @media (max-width: 768px) {
-        .back-btn {
-            display: block;
+        .contacts-sidebar {
+            display: none;
         }
     }
 </style>
@@ -176,8 +164,8 @@
 
 {% block content %}
 <div class="chat-container">
-    <!-- Left Sidebar - Contacts (hidden on mobile when in chat) -->
-    <div class="contacts-sidebar" id="contactsSidebar">
+    <!-- Left Sidebar - Contacts -->
+    <div class="contacts-sidebar">
         <div class="sidebar-header">
             <div class="user-profile">
                 <div class="profile-pic">
@@ -190,20 +178,59 @@
                 <span style="font-weight: 500;">{{ current_user.get_full_name|default:current_user.username }}</span>
             </div>
             <div class="header-actions">
-                <a href="{% url 'chat_home' %}" class="action-btn" title="Home">🏠</a>
-                <a href="{% url 'logout' %}" class="action-btn" title="Logout">🚪</a>
+                <a href="{% url 'chat_home' %}" class="action-btn" title="Home">Home</a>
+                <a href="{% url 'logout' %}" class="action-btn" title="Logout">Logout</a>
             </div>
         </div>
 
         <div class="search-container">
-            <input type="text" class="search-box" placeholder="Search chats">
+            <input type="text" class="search-box" placeholder="Search chats" disabled>
         </div>
 
         <div class="contacts-list">
-            <!-- Chat list would go here -->
-            <a href="{% url 'chat_home' %}" style="display: block; padding: 15px 20px; text-decoration: none; color: #25d366; text-align: center;">
-                ← Back to all chats
-            </a>
+            {% for chat_item in chats %}
+                {% if chat_item.chat_type == 'private' %}
+                    {% with other_user=chat_item|get_other_participant:current_user %}
+                        {% if other_user %}
+                            <a href="{% url 'chat_room' chat_item.id %}" class="contact-item {% if chat_item.id == active_chat_id %}active{% endif %}">
+                                <div class="contact-avatar" style="background: {{ other_user.id|get_avatar_color }}; position: relative;">
+                                    {% if other_user.userprofile %}
+                                        {{ other_user.userprofile.get_avatar_initials }}
+                                        {% if other_user.userprofile.is_online %}
+                                            <div class="online-indicator"></div>
+                                        {% endif %}
+                                    {% else %}
+                                        {{ other_user.username|slice:":2"|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="contact-info">
+                                    <div class="contact-name">{{ other_user.get_full_name|default:other_user.username }}</div>
+                                    <div class="contact-last-message">
+                                        {% with last_message=chat_item.get_last_message %}
+                                            {% if last_message %}
+                                                {% if last_message.sender == current_user %}
+                                                    You: {{ last_message.content|truncatechars:30 }}
+                                                {% else %}
+                                                    {{ last_message.content|truncatechars:35 }}
+                                                {% endif %}
+                                            {% else %}
+                                                No messages yet
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <div class="contact-meta">
+                                    {% with last_message=chat_item.get_last_message %}
+                                        {% if last_message %}
+                                            <div class="message-time">{{ last_message.timestamp|date:"g:i A" }}</div>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                            </a>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 
@@ -213,7 +240,6 @@
         <div id="connectionStatus" class="connection-status connecting">Connecting...</div>
         
         <div class="chat-header">
-            <button class="back-btn" onclick="goBack()">←</button>
             {% if chat.chat_type == 'private' %}
                 {% with other_user=chat|get_other_participant:current_user %}
                     {% if other_user %}
@@ -241,16 +267,14 @@
                 {% endwith %}
             {% endif %}
             <div class="chat-actions">
-                <button class="action-btn">🔍</button>
-                <button class="action-btn">📞</button>
-                <button class="action-btn">📹</button>
-                <button class="action-btn">⋮</button>
+                <button class="action-btn">Search</button>
+                <button class="action-btn">More</button>
             </div>
         </div>
 
         <div class="messages-container" id="messagesContainer">
             {% for message in messages %}
-                <div class="message {% if message.sender == current_user %}sent{% else %}received{% endif %}">
+                <div class="message {% if message.sender == current_user %}sent{% else %}received{% endif %}" data-timestamp="{{ message.timestamp.isoformat }}">
                     <div class="message-text">{{ message.content }}</div>
                     <div class="message-time">{{ message.timestamp|date:"g:i A" }}</div>
                 </div>
@@ -260,12 +284,8 @@
         <div class="typing-indicator" id="typingIndicator" style="display: none;"></div>
 
         <div class="message-input-container">
-            <div class="input-actions">
-                <button class="action-btn">😊</button>
-                <button class="action-btn">📎</button>
-            </div>
             <input type="text" class="message-input" placeholder="Type a message" id="messageInput">
-            <button class="send-btn" id="sendBtn">➤</button>
+            <button class="send-btn" id="sendBtn">Send</button>
         </div>
     </div>
 </div>
@@ -292,7 +312,7 @@ function updateConnectionStatus(status) {
     switch(status) {
         case 'connected':
             statusElement.textContent = 'Connected';
-            statusElement.style.display = 'none'; // Hide when connected
+            statusElement.style.display = 'none';
             sendBtn.disabled = false;
             messageInput.disabled = false;
             reconnectAttempts = 0;
@@ -312,14 +332,39 @@ function updateConnectionStatus(status) {
     }
 }
 
+// Format timestamp for real-time display
+function formatTimestamp(timestamp) {
+    const now = new Date();
+    const messageTime = new Date(timestamp);
+    const diffInMinutes = Math.floor((now - messageTime) / (1000 * 60));
+    
+    if (diffInMinutes < 1) {
+        return 'now';
+    } else if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+    } else {
+        return messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+}
+
+// Update all message timestamps
+function updateTimestamps() {
+    const messages = document.querySelectorAll('.message[data-timestamp]');
+    messages.forEach(message => {
+        const timestamp = message.getAttribute('data-timestamp');
+        const timeElement = message.querySelector('.message-time');
+        if (timeElement && timestamp) {
+            timeElement.textContent = formatTimestamp(timestamp);
+        }
+    });
+}
+
 // Initialize WebSocket connection
 function initWebSocket() {
     updateConnectionStatus('connecting');
     
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws/chat/${chatId}/`;
-    
-    console.log('Connecting to WebSocket:', wsUrl);
     
     chatSocket = new WebSocket(wsUrl);
     
@@ -331,7 +376,6 @@ function initWebSocket() {
     chatSocket.onmessage = function(e) {
         try {
             const data = JSON.parse(e.data);
-            console.log('Received message:', data);
             
             if (data.type === 'chat_message') {
                 addMessageToChat(data.message, data.sender, data.timestamp, data.sender_id);
@@ -344,17 +388,12 @@ function initWebSocket() {
     };
     
     chatSocket.onclose = function(e) {
-        console.log('WebSocket connection closed:', e.code, e.reason);
+        console.log('WebSocket connection closed');
         updateConnectionStatus('disconnected');
         
-        // Attempt to reconnect
         if (reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
-            console.log(`Reconnection attempt ${reconnectAttempts}/${maxReconnectAttempts}`);
             setTimeout(initWebSocket, 3000 * reconnectAttempts);
-        } else {
-            console.error('Max reconnection attempts reached');
-            updateConnectionStatus('disconnected');
         }
     };
     
@@ -369,11 +408,13 @@ function addMessageToChat(message, sender, timestamp, senderId) {
     const messagesContainer = document.getElementById('messagesContainer');
     const messageDiv = document.createElement('div');
     const isOwn = senderId === currentUserId;
+    const now = new Date().toISOString();
     
     messageDiv.className = `message ${isOwn ? 'sent' : 'received'}`;
+    messageDiv.setAttribute('data-timestamp', now);
     messageDiv.innerHTML = `
         <div class="message-text">${escapeHtml(message)}</div>
-        <div class="message-time">${timestamp}</div>
+        <div class="message-time">now</div>
     `;
     
     messagesContainer.appendChild(messageDiv);
@@ -392,27 +433,18 @@ function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const message = messageInput.value.trim();
     
-    console.log('Attempting to send message:', message);
-    
-    if (!message) {
-        console.log('Empty message, not sending');
-        return;
-    }
+    if (!message) return;
     
     if (chatSocket.readyState !== WebSocket.OPEN) {
-        console.error('WebSocket is not connected. ReadyState:', chatSocket.readyState);
-        alert('Connection lost. Please wait for reconnection or refresh the page.');
+        alert('Connection lost. Please wait for reconnection.');
         return;
     }
     
     try {
-        const messageData = {
+        chatSocket.send(JSON.stringify({
             'type': 'chat_message',
             'message': message
-        };
-        
-        console.log('Sending message data:', messageData);
-        chatSocket.send(JSON.stringify(messageData));
+        }));
         messageInput.value = '';
         
         // Stop typing indicator
@@ -423,7 +455,6 @@ function sendMessage() {
         
     } catch (error) {
         console.error('Error sending message:', error);
-        alert('Failed to send message. Please try again.');
     }
 }
 
@@ -454,10 +485,7 @@ function sendTypingIndicator(isTyping) {
 }
 
 // Event listeners
-document.getElementById('sendBtn').addEventListener('click', function(e) {
-    e.preventDefault();
-    sendMessage();
-});
+document.getElementById('sendBtn').addEventListener('click', sendMessage);
 
 document.getElementById('messageInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
@@ -476,36 +504,23 @@ document.getElementById('messageInput').addEventListener('input', function() {
     }, 1000);
 });
 
-// Back button for mobile
-function goBack() {
-    window.location.href = '{% url "chat_home" %}';
-}
-
-// Initialize WebSocket when page loads
+// Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded, initializing WebSocket for chat:', chatId);
     initWebSocket();
     
-    // Scroll to bottom of messages
+    // Scroll to bottom
     const messagesContainer = document.getElementById('messagesContainer');
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Update timestamps every minute
+    setInterval(updateTimestamps, 60000);
 });
 
-// Clean up WebSocket connection when page unloads
+// Clean up on page unload
 window.addEventListener('beforeunload', function() {
     if (chatSocket) {
         chatSocket.close();
     }
 });
-
-// Test WebSocket connection
-function testConnection() {
-    console.log('WebSocket state:', chatSocket ? chatSocket.readyState : 'null');
-    console.log('Chat ID:', chatId);
-    console.log('Current User:', currentUser, currentUserId);
-}
-
-// Make test function available globally for debugging
-window.testConnection = testConnection;
 </script>
 {% endblock %}
