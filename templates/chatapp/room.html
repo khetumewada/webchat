@@ -319,8 +319,11 @@
         </div>
 
         <div class="search-container">
-            <input type="text" class="search-box" placeholder="Search chats" disabled style="opacity: 0.6;">
-        </div>
+    <div style="position: relative;">
+        <input type="text" class="search-box" placeholder="Search in conversation..." id="chatSearchInput">
+        <div id="chatSearchResults" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--primary-color); border-top: none; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.1);"></div>
+    </div>
+</div>
 
         <div class="contacts-list">
             {% for chat_item in chats %}
@@ -655,6 +658,100 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('beforeunload', function() {
     if (chatSocket) {
         chatSocket.close();
+    }
+});
+
+// Chat search functionality
+document.getElementById('chatSearchInput').addEventListener('input', function() {
+    const query = this.value.trim().toLowerCase();
+    const resultsDiv = document.getElementById('chatSearchResults');
+    const messages = document.querySelectorAll('.message');
+    
+    if (query.length > 0) {
+        let matchingMessages = [];
+        
+        messages.forEach((message, index) => {
+            const messageText = message.querySelector('.message-text');
+            const messageTime = message.querySelector('.message-time');
+            
+            if (messageText && messageText.textContent.toLowerCase().includes(query)) {
+                matchingMessages.push({
+                    text: messageText.textContent,
+                    time: messageTime ? messageTime.textContent : '',
+                    element: message,
+                    index: index
+                });
+            }
+        });
+        
+        resultsDiv.innerHTML = '';
+        
+        if (matchingMessages.length > 0) {
+            matchingMessages.slice(0, 5).forEach(match => {
+                const resultDiv = document.createElement('div');
+                resultDiv.style.cssText = 'padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--border-color); transition: var(--transition);';
+                
+                const highlightedText = match.text.replace(
+                    new RegExp(query, 'gi'), 
+                    `<mark style="background: #ffeb3b; padding: 1px 2px; border-radius: 2px;">$&</mark>`
+                );
+                
+                resultDiv.innerHTML = `
+                    <div style="font-size: 12px; color: var(--text-primary); margin-bottom: 2px;">${highlightedText}</div>
+                    <div style="font-size: 10px; color: var(--text-secondary);">${match.time}</div>
+                `;
+                
+                resultDiv.addEventListener('mouseenter', () => {
+                    resultDiv.style.backgroundColor = 'var(--hover-color)';
+                });
+                resultDiv.addEventListener('mouseleave', () => {
+                    resultDiv.style.backgroundColor = 'transparent';
+                });
+                resultDiv.addEventListener('click', () => {
+                    match.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    match.element.style.backgroundColor = '#fff3cd';
+                    setTimeout(() => {
+                        match.element.style.backgroundColor = '';
+                    }, 2000);
+                    resultsDiv.style.display = 'none';
+                    document.getElementById('chatSearchInput').value = '';
+                });
+                
+                resultsDiv.appendChild(resultDiv);
+            });
+            
+            if (matchingMessages.length > 5) {
+                const moreDiv = document.createElement('div');
+                moreDiv.style.cssText = 'padding: 8px 12px; text-align: center; color: var(--text-secondary); font-size: 11px; font-style: italic;';
+                moreDiv.textContent = `+${matchingMessages.length - 5} more results`;
+                resultsDiv.appendChild(moreDiv);
+            }
+            
+            resultsDiv.style.display = 'block';
+        } else {
+            resultsDiv.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 12px;">No messages found</div>';
+            resultsDiv.style.display = 'block';
+        }
+    } else {
+        resultsDiv.style.display = 'none';
+    }
+});
+
+// Hide chat search results when clicking outside
+document.addEventListener('click', function(e) {
+    const chatSearchInput = document.getElementById('chatSearchInput');
+    const chatSearchResults = document.getElementById('chatSearchResults');
+    
+    if (!chatSearchInput.contains(e.target) && !chatSearchResults.contains(e.target)) {
+        chatSearchResults.style.display = 'none';
+    }
+});
+
+// Clear search when pressing Escape
+document.getElementById('chatSearchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        this.value = '';
+        document.getElementById('chatSearchResults').style.display = 'none';
     }
 });
 </script>

@@ -168,33 +168,67 @@
 
 {% block extra_js %}
 <script>
-function showUserMenu() {
-    const menu = document.getElementById('userMenu');
-    const isVisible = menu.classList.contains('show');
-    
-    if (isVisible) {
-        menu.classList.remove('show');
-    } else {
-        menu.classList.add('show');
-    }
-}
+// Global variables
+let userMenuVisible = false;
 
-// Close user menu when clicking outside
-document.addEventListener('click', function(e) {
+function showUserMenu() {
     const menu = document.getElementById('userMenu');
     const menuBtn = document.getElementById('menuBtn');
     
-    if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
-        menu.classList.remove('show');
+    console.log('Menu button clicked'); // Debug log
+    
+    if (!menu) {
+        console.error('Menu element not found');
+        return;
     }
-});
+    
+    userMenuVisible = !userMenuVisible;
+    
+    if (userMenuVisible) {
+        menu.classList.add('show');
+        console.log('Menu shown');
+    } else {
+        menu.classList.remove('show');
+        console.log('Menu hidden');
+    }
+}
 
-// Close menu when pressing Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const menu = document.getElementById('userMenu');
-        menu.classList.remove('show');
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing menu');
+    
+    // Ensure menu button works
+    const menuBtn = document.getElementById('menuBtn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            showUserMenu();
+        });
+        console.log('Menu button event listener added');
     }
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('userMenu');
+        const menuBtn = document.getElementById('menuBtn');
+        
+        if (menu && menuBtn && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
+            menu.classList.remove('show');
+            userMenuVisible = false;
+        }
+    });
+    
+    // Close menu with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const menu = document.getElementById('userMenu');
+            if (menu) {
+                menu.classList.remove('show');
+                userMenuVisible = false;
+            }
+        }
+    });
 });
 
 // Enhanced search functionality
@@ -253,6 +287,11 @@ document.getElementById('searchInput').addEventListener('input', function() {
                     resultsDiv.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 12px;">No users found</div>';
                     resultsDiv.style.display = 'block';
                 }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                resultsDiv.innerHTML = '<div style="padding: 24px; text-align: center; color: #ff6b6b; font-size: 12px;">Search failed. Please try again.</div>';
+                resultsDiv.style.display = 'block';
             });
     } else {
         resultsDiv.style.display = 'none';
