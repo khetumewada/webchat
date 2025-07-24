@@ -11,7 +11,7 @@ webchat/
 │   ├── views.py          # Auth views, profile management
 │   ├── forms.py          # Profile forms
 │   ├── urls.py           # Auth URLs
-│   └── templates/accounts/
+│   └── templates/accounts/  # Auth templates (login, register, profile, welcome)
 ├── chatapp/              # All Chat Features
 │   ├── models.py         # Chat, Message models
 │   ├── views.py          # Chat views, API endpoints
@@ -19,8 +19,8 @@ webchat/
 │   ├── templatetags.py   # Template filters
 │   ├── routing.py        # WebSocket routing
 │   ├── urls.py           # Chat URLs
-│   └── templates/chatapp/
-├── templates/            # Shared templates
+│   └── templates/chatapp/  # Chat templates (home, room)
+├── templates/            # Shared templates (base.html)
 ├── webchat/             # Django project settings
 └── manage.py
 \`\`\`
@@ -48,7 +48,7 @@ webchat/
 
 ## ✨ Features
 
-- 🔐 **Clean Authentication** - Register, login, logout with profiles
+- 🔐 **Clean Authentication** - Single set of auth templates
 - 💬 **Real-time Chat** - WebSocket-powered instant messaging
 - 👥 **User Search** - Find and start conversations
 - 📱 **Responsive Design** - Perfect on all devices
@@ -57,7 +57,7 @@ webchat/
 
 ## 🎯 Perfect Structure
 
-- **No unnecessary folders** - Clean and organized
+- **No duplicate templates** - Single login/register templates
 - **Single chat app** - All chat features in one place
 - **Proper sizing** - No oversized elements
 - **Modern send button** - Beautiful arrow animation
@@ -66,10 +66,11 @@ webchat/
 
 ## 📱 Usage
 
-1. **Register** - Create your account
-2. **Search Users** - Find people to chat with
-3. **Start Chatting** - Real-time messaging
-4. **Profile** - Update your information
+1. **Register** - Create your account at `/accounts/register/`
+2. **Login** - Sign in at `/accounts/login/`
+3. **Search Users** - Find people to chat with
+4. **Start Chatting** - Real-time messaging
+5. **Profile** - Update your information at `/accounts/profile/`
 
 ## 🛠️ Technology Stack
 
@@ -82,13 +83,3 @@ webchat/
 ## 📝 License
 
 MIT License - Open source and free to use.
-\`\`\`
-
-Update the requirements to be minimal:
-
-```plaintext file="requirements.txt"
-Django==5.0.1
-channels==4.0.0
-channels-redis==4.2.0
-redis==5.0.1
-asgiref==3.7.2
