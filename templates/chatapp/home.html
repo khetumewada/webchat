@@ -185,6 +185,7 @@
 
 {% block script %}
     <script>
+        console.log("SCRIPT LOADED");
         // Global variables
         let userMenuVisible = false;
 
@@ -216,9 +217,11 @@
             const menuBtn = document.getElementById('menuBtn');
             if (menuBtn) {
                 menuBtn.addEventListener('click', function (e) {
+                    console.log('clicked');
                     e.preventDefault();
                     e.stopPropagation();
-                    toggleUserMenu();
+                    {#toggleUserMenu();#}
+                    userMenu.classList.toggle("show");
                 });
             }
 
