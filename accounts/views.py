@@ -5,14 +5,14 @@ from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
 from django.contrib import messages
 from .models import UserProfile
-from .forms import UserProfileForm
+from .forms import UserProfileForm, CustomRegisterForm
+
 
 def register_view(request):
     if request.user.is_authenticated:
         return redirect('chatapp:home')
-        
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
             # Create user profile
@@ -24,8 +24,28 @@ def register_view(request):
             messages.success(request, f'Welcome to WebChat, {username}!')
             return redirect('chatapp:home')
     else:
-        form = UserCreationForm()
+        form = CustomRegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
+
+# def register_view(request):
+#     if request.user.is_authenticated:
+#         return redirect('chatapp:home')
+#
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             # Create user profile
+#             UserProfile.objects.create(user=user)
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password1')
+#             user = authenticate(username=username, password=password)
+#             login(request, user)
+#             messages.success(request, f'Welcome to WebChat, {username}!')
+#             return redirect('chatapp:home')
+#     else:
+#         form = UserCreationForm()
+#     return render(request, 'accounts/register.html', {'form': form})
 
 @login_required
 def logout_view(request):
