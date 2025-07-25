@@ -58,17 +58,11 @@ def profile_view(request):
             # Update profile
             form.save()
             messages.success(request, 'Profile updated successfully!')
-            return redirect('profile')
+            return redirect('accounts:profile')
     else:
         form = UserProfileForm(instance=profile, user=request.user)
 
     return render(request, 'accounts/profile.html', {'form': form, 'profile': profile})
-    
-    # return render(request, 'accounts/profile.html', {
-    #     'form': form,
-    #     'profile': profile,
-    #     'user': request.user
-    # })
 
 def welcome_view(request):
     if request.user.is_authenticated:
