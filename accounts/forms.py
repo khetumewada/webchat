@@ -11,7 +11,7 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields = ['bio', 'phone']
         widgets = {
-            'bio': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tell us about yourself...'}),
+            'bio': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Tell us about yourself...'}),
             'phone': forms.TextInput(attrs={'placeholder': 'Your phone number'}),
         }
     
@@ -26,4 +26,4 @@ class UserProfileForm(forms.ModelForm):
         
         # Add CSS classes
         for field in self.fields:
-            self.fields[field].widget.attrs.update({'class': 'form-input'})
+            self.fields[field].widget.attrs.update({'class': 'form-control'})

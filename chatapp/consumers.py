@@ -1,9 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from django.contrib.auth.models import User
-from .models import Chat, Message
-from accounts.models import UserProfile
 from django.utils import timezone
 import logging
 
@@ -132,6 +129,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def is_chat_participant(self):
+        from .models import Chat
         try:
             chat = Chat.objects.get(id=self.chat_id)
             return chat.participants.filter(id=self.user.id).exists()
@@ -144,6 +142,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def save_message(self, content):
+        from .models import Chat, Message
         try:
             chat = Chat.objects.get(id=self.chat_id)
             message = Message.objects.create(
@@ -171,6 +170,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def update_user_status(self, is_online):
+        from accounts.models import UserProfile
         try:
             profile, created = UserProfile.objects.get_or_create(user=self.user)
             profile.is_online = is_online

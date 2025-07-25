@@ -45,7 +45,7 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
+
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=profile, user=request.user)
         if form.is_valid():
@@ -54,19 +54,21 @@ def profile_view(request):
             request.user.last_name = form.cleaned_data['last_name']
             request.user.email = form.cleaned_data['email']
             request.user.save()
-            
+
             # Update profile
             form.save()
             messages.success(request, 'Profile updated successfully!')
-            return redirect('accounts:profile')
+            return redirect('profile')
     else:
         form = UserProfileForm(instance=profile, user=request.user)
+
+    return render(request, 'accounts/profile.html', {'form': form, 'profile': profile})
     
-    return render(request, 'accounts/profile.html', {
-        'form': form, 
-        'profile': profile,
-        'user': request.user
-    })
+    # return render(request, 'accounts/profile.html', {
+    #     'form': form,
+    #     'profile': profile,
+    #     'user': request.user
+    # })
 
 def welcome_view(request):
     if request.user.is_authenticated:

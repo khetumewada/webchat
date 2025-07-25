@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from django.db.models import Q, Max
 from django.utils import timezone
 from django.contrib import messages
+
+from accounts.forms import UserProfileForm
 from .models import Chat, Message, MessageRead
 from accounts.models import UserProfile
 
