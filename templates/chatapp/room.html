@@ -413,10 +413,10 @@
                         {% endif %}
                     {% endwith %}
                 {% endif %}
-                <div class="chat-actions" style="position:relative;">
+                <div class="chat-actions" style="position: relative; display: flex; gap: 8px;">
                     <button class="action-btn">🔍</button>
                     <button class="action-btn" id="dropdownToggleBtn">⋮</button>
-                    <div class="dropdown-menu" id="chatDropdownMenu">
+                    <div class="dropdown-menu" id="chatDropdownMenu" style="right: 0;">
                         <div class="dropdown-header">Chat Options</div>
                         <button class="dropdown-item" onclick="alert('Mute chat!')">Mute Chat</button>
                         <button class="dropdown-item danger" onclick="alert('Report user!')">Report User</button>
@@ -658,6 +658,29 @@
             }, 1000);
         });
 
+        // Dropdown functionality
+        let dropdownVisible = false;
+
+        function toggleChatDropdown() {
+            const menu = document.getElementById('chatDropdownMenu');
+            const toggleBtn = document.getElementById('dropdownToggleBtn');
+
+            if (!menu) {
+                console.error('Chat dropdown menu element not found');
+                return;
+            }
+
+            dropdownVisible = !dropdownVisible;
+
+            if (dropdownVisible) {
+                menu.classList.add('show');
+                toggleBtn.style.background = 'rgba(255,255,255,0.2)';
+            } else {
+                menu.classList.remove('show');
+                toggleBtn.style.background = 'transparent';
+            }
+        }
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function () {
             initWebSocket();
@@ -668,6 +691,41 @@
 
             // Update all existing timestamps to show correct format
             updateTimestamps();
+
+            // Setup dropdown functionality
+            const dropdownToggleBtn = document.getElementById('dropdownToggleBtn');
+            if (dropdownToggleBtn) {
+                dropdownToggleBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleChatDropdown();
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                const menu = document.getElementById('chatDropdownMenu');
+                const toggleBtn = document.getElementById('dropdownToggleBtn');
+
+                if (menu && toggleBtn && !menu.contains(e.target) && !toggleBtn.contains(e.target) && dropdownVisible) {
+                    menu.classList.remove('show');
+                    toggleBtn.style.background = 'transparent';
+                    dropdownVisible = false;
+                }
+            });
+
+            // Close dropdown with Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && dropdownVisible) {
+                    const menu = document.getElementById('chatDropdownMenu');
+                    const toggleBtn = document.getElementById('dropdownToggleBtn');
+                    if (menu) {
+                        menu.classList.remove('show');
+                        toggleBtn.style.background = 'transparent';
+                        dropdownVisible = false;
+                    }
+                }
+            });
         });
 
         // Clean up on page unload
