@@ -22,52 +22,28 @@
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button class="action-btn" onclick="showUserMenu()" title="Menu" id="menuBtn">⋮</button>
+                    <button class="action-btn" onclick="toggleUserMenu()" title="Menu" id="menuBtn">⋮</button>
                 </div>
             </div>
 
             <!-- User Menu Dropdown -->
-            <div id="userMenu"
-                 style="display: none; position: absolute; top: 85px; right: 20px; background: white; border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 1000; min-width: 220px; overflow: hidden;">
-                <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+            <div id="userMenu" class="dropdown-menu" style="top: 85px; right: 20px;">
+                <div class="dropdown-header">
                     <div style="font-weight: 600; color: white;">{{ current_user.get_full_name|default:current_user.username }}</div>
                     <div style="font-size: 13px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>
                 </div>
-                <div style="padding: 10px 0;">
-                    <a href="{% url 'accounts:profile' %}"
-                       style="display: flex; align-items: center; padding: 15px 20px; color: var(--text-primary); text-decoration: none; font-size: 14px; font-weight: 500; transition: var(--transition);"
-                       onmouseover="this.style.backgroundColor='var(--hover-color)'"
-                       onmouseout="this.style.backgroundColor='transparent'">
+                <div style="padding: 8px 0;">
+                    <a href="{% url 'accounts:profile' %}" class="dropdown-item">
                         <span style="margin-right: 12px; font-size: 16px;">👤</span>
                         Profile Settings
                     </a>
-                    <div style="border-top: 1px solid var(--border-color); margin: 8px 0;"></div>
-                    <a href="{% url 'accounts:logout' %}"
-                       style="display: flex; align-items: center; padding: 15px 20px; color: #d32f2f; text-decoration: none; font-size: 14px; font-weight: 500; transition: var(--transition);"
-                       onmouseover="this.style.backgroundColor='#ffebee'"
-                       onmouseout="this.style.backgroundColor='transparent'">
+                    <div style="border-top: 1px solid var(--border-color); margin: 6px 0;"></div>
+                    <a href="{% url 'accounts:logout' %}" class="dropdown-item danger">
                         <span style="margin-right: 12px; font-size: 16px;">🚪</span>
                         Logout
                     </a>
                 </div>
             </div>
-            {#            <div id="userMenu" class="dropdown-menu">#}
-            {#                <div class="dropdown-header">#}
-            {#                    <div style="font-weight: 600; color: white; font-size: 13px;">{{ current_user.get_full_name|default:current_user.username }}</div>#}
-            {#                    <div style="font-size: 11px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>#}
-            {#                </div>#}
-            {#                <div style="padding: 8px 0;">#}
-            {#                    <a href="{% url 'accounts:profile' %}" class="dropdown-item">#}
-            {#                        <span style="margin-right: 10px; font-size: 14px;">👤</span>#}
-            {#                        Profile Settings#}
-            {#                    </a>#}
-            {#                    <div style="border-top: 1px solid var(--border-color); margin: 6px 0;"></div>#}
-            {#                    <a href="{% url 'accounts:logout' %}" class="dropdown-item danger">#}
-            {#                        <span style="margin-right: 10px; font-size: 14px;">🚪</span>#}
-            {#                        Logout#}
-            {#                    </a>#}
-            {#                </div>#}
-            {#            </div>#}
 
             <!-- Search Container -->
             <div class="search-container">
@@ -210,33 +186,26 @@
 {% block script %}
     <script>
         // Global variables
-        {#let userMenuVisible = false;#}
+        let userMenuVisible = false;
 
-        {#function showUserMenu() {#}
-        {#    const menu = document.getElementById('userMenu');#}
-        {#    const menuBtn = document.getElementById('menuBtn');#}
-        {##}
-        {#    console.log('Menu button clicked'); // Debug log#}
-        {##}
-        {#    if (!menu) {#}
-        {#        console.error('Menu element not found');#}
-        {#        return;#}
-        {#    }#}
-        {##}
-        {#    userMenuVisible = !userMenuVisible;#}
-        {##}
-        {#    if (userMenuVisible) {#}
-        {#        menu.classList.add('show');#}
-        {#        console.log('Menu shown');#}
-        {#    } else {#}
-        {#        menu.classList.remove('show');#}
-        {#        console.log('Menu hidden');#}
-        {#    }#}
-        {# } #}
-
-        function showUserMenu() {
+        function toggleUserMenu() {
             const menu = document.getElementById('userMenu');
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            const menuBtn = document.getElementById('menuBtn');
+
+            if (!menu) {
+                console.error('Menu element not found');
+                return;
+            }
+
+            userMenuVisible = !userMenuVisible;
+
+            if (userMenuVisible) {
+                menu.classList.add('show');
+                menuBtn.style.background = 'rgba(255,255,255,0.2)';
+            } else {
+                menu.classList.remove('show');
+                menuBtn.style.background = 'transparent';
+            }
         }
 
         // Initialize when DOM is loaded
@@ -249,9 +218,8 @@
                 menuBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    showUserMenu();
+                    toggleUserMenu();
                 });
-                console.log('Menu button event listener added');
             }
 
             // Close menu when clicking outside
@@ -259,18 +227,21 @@
                 const menu = document.getElementById('userMenu');
                 const menuBtn = document.getElementById('menuBtn');
 
-                if (menu && menuBtn && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
+                if (menu && menuBtn && !menu.contains(e.target) && !menuBtn.contains(e.target) && userMenuVisible) {
                     menu.classList.remove('show');
+                    menuBtn.style.background = 'transparent';
                     userMenuVisible = false;
                 }
-             });
+            });
 
             // Close menu with Escape key
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
+                if (e.key === 'Escape' && userMenuVisible) {
                     const menu = document.getElementById('userMenu');
+                    const menuBtn = document.getElementById('menuBtn');
                     if (menu) {
                         menu.classList.remove('show');
+                        menuBtn.style.background = 'transparent';
                         userMenuVisible = false;
                     }
                 }
