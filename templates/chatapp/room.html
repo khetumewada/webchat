@@ -413,10 +413,10 @@
                         {% endif %}
                     {% endwith %}
                 {% endif %}
-                <div class="chat-actions" style="position:relative;">
+                <div class="chat-actions" style="position: relative; display: flex; gap: 8px;">
                     <button class="action-btn">🔍</button>
                     <button class="action-btn" id="dropdownToggleBtn">⋮</button>
-                    <div class="dropdown-menu" id="chatDropdownMenu">
+                    <div class="dropdown-menu" id="chatDropdownMenu" style="right: 0;">
                         <div class="dropdown-header">Chat Options</div>
                         <button class="dropdown-item" onclick="alert('Mute chat!')">Mute Chat</button>
                         <button class="dropdown-item danger" onclick="alert('Report user!')">Report User</button>
