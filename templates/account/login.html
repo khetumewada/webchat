@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - WebChat{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <form method="post" class="auth-form">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #00a884, #25d366); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 16px; box-shadow: 0 4px 16px rgba(0, 168, 132, 0.3);">💬</div>
+            <h2>Welcome Back</h2>
+            <p style="color: #667781; margin-top: 8px; font-size: 13px;">Sign in to continue to WebChat</p>
+        </div>
+
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="error-message">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            <input type="text" id="{{ form.username.id_for_label }}" name="{{ form.username.name }}" value="{{ form.username.value|default:'' }}" required placeholder="Enter your username" class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            <input type="password" id="{{ form.password.id_for_label }}" name="{{ form.password.name }}" required placeholder="Enter your password" class="form-input">
+        </div>
+
+        <button type="submit" class="btn-primary">Sign In</button>
+
+        <div class="auth-links">
+            <p style="color: #667781; font-size: 13px;">Don't have an account? <a href="{% url 'account:register' %}">Create one here</a></p>
+        </div>
+    </form>
+</div>
+{% endblock %}

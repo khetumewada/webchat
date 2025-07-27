@@ -1,0 +1,8 @@
+Django==5.2.4
+channels==4.2.2
+channels_redis==4.3.0
+daphne==4.2.1
+pillow==11.3.0
+psycopg==3.2.9
+redis==6.2.0
+gunicorn==23.0.0

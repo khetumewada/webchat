@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load chat_extras %}
+
+{% block title %}WebChat - Home{% endblock %}
+
+{% block content %}
+    <div class="chat-container">
+        <!-- Left Sidebar - Contacts -->
+        <div class="contacts-sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    {% with userprofile=current_user.userprofile %}
+                        {% if userprofile.image %}
+                            <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #fff;">
+                                <img src="{{ userprofile.image.url }}"
+                                     alt="Profile Image"
+                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            </div>
+                        {% else %}
+                            <div class="profile-pic"
+                                 style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 16px;">
+                                {{ userprofile.get_avatar_initials }}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px; color: white;">
+                            {{ current_user.get_full_name|default:current_user.username }}
+                        </div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.8);">
+                            @{{ current_user.username }}
+                        </div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" onclick="toggleUserMenu()" title="Menu" id="menuBtn">⋮</button>
+                </div>
+            </div>
+
+            <!-- User Menu Dropdown -->
+            <div id="userMenu" class="dropdown-menu" style="top: 85px; right: 20px;">
+                <div class="dropdown-header">
+                    <div style="font-weight: 600; color: white;">{{ current_user.get_full_name|default:current_user.username }}</div>
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>
+                </div>
+                <div style="padding: 8px 0;">
+                    <a href="{% url 'account:profile' %}?next={{ request.path }}
+" class="dropdown-item">
+                        <span style="margin-right: 12px; font-size: 16px;">👤</span>
+                        Profile Settings
+                    </a>
+                    <div style="border-top: 1px solid var(--border-color); margin: 6px 0;"></div>
+                    <a href="{% url 'account:logout' %}" class="dropdown-item danger">
+                        <span style="margin-right: 12px; font-size: 16px;">🚪</span>
+                        Logout
+                    </a>
+                </div>
+            </div>
+
+            <!-- Search Container -->
+            <div class="search-container">
+                <div style="position: relative;">
+                    <input type="text" class="search-box" placeholder="Search users to chat..." id="searchInput">
+                    <div id="searchResults"
+                         style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--primary-color); border-top: none; border-radius: 0 0 8px 8px; max-height: 280px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.1);"></div>
+                </div>
+            </div>
+
+            <div class="contacts-list" id="contactsList">
+                {% for chat in chats %}
+                    {% if chat.chat_type == 'private' %}
+                        {% with other_user=chat|get_other_participant:current_user %}
+                            {% if other_user %}
+                                <a href="{% url 'chatapp:room' chat.id %}" class="contact-item">
+                                    <div class="contact-avatar"
+                                         style="background: {{ other_user.id|get_avatar_color }}; position: relative; overflow: hidden; border-radius: 50%; width: 40px; height: 40px;">
+                                        {% if other_user.userprofile and other_user.userprofile.image%}
+                                            <img src="{{ other_user.userprofile.image.url }}" alt="Avatar"
+                                                 style="width: 100%; height: 100%; object-fit: cover;"/>
+                                        {% else %}
+                                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                                {{ other_user.userprofile.get_avatar_initials|default:other_user.username|slice:":2"|upper }}
+                                            </div>
+                                        {% endif %}
+                                        {% if other_user.userprofile.is_online %}
+                                            <div class="online-indicator"></div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="contact-info">
+                                        <div class="contact-name">{{ other_user.get_full_name|default:other_user.username }}</div>
+                                        <div class="contact-last-message">
+                                            {% with last_message=chat.get_last_message %}
+                                                {% if last_message %}
+                                                    {% if last_message.sender == current_user %}
+                                                        You: {{ last_message.content|truncatechars:30 }}
+                                                    {% else %}
+                                                        {{ last_message.content|truncatechars:35 }}
+                                                    {% endif %}
+                                                {% else %}
+                                                    Start a conversation...
+                                                {% endif %}
+                                            {% endwith %}
+                                        </div>
+                                    </div>
+                                    <div class="contact-meta">
+                                        {% with last_message=chat.get_last_message %}
+                                            {% if last_message.timestamp.date == today %}
+                                                <div class="message-time">
+                                                    {{ last_message.timestamp|date:"g:i A" }}</div>
+                                            {% else %}
+                                                <div class="message-time">
+                                                    {{ last_message.timestamp|format_message_time }}</div>
+                                            {% endif %}
+                                        {% endwith %}
+
+                                    </div>
+
+                                </a>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                {% empty %}
+                    <div style="padding: 48px 24px; text-align: center; color: var(--text-secondary);">
+                        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 20px; opacity: 0.8;">
+                            💬
+                        </div>
+                        <h3 style="margin-bottom: 12px; color: var(--text-primary); font-weight: 600; font-size: 16px;">
+                            No conversations yet</h3>
+                        <p style="line-height: 1.5; font-size: 12px;">Search for users above to start your first
+                            conversation.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Right Side - Welcome Screen -->
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8f9fa; text-align: center; padding: 48px;">
+
+            <div style="width: 96px; height: 96px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; margin-bottom: 32px; box-shadow: 0 8px 24px rgba(0, 168, 132, 0.3);">
+                💬
+            </div>
+
+            <h1 style="font-size: 28px; color: var(--text-primary); margin-bottom: 16px; font-weight: 700;">Welcome to
+                WebChat</h1>
+
+            <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; max-width: 400px;">
+                Send and receive messages in real-time.<br>
+                <strong>Search for users above</strong> to start a conversation.
+            </p>
+
+            <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); max-width: 320px;">
+                <h3 style="color: var(--text-primary); margin-bottom: 16px; font-weight: 600; font-size: 14px;">Quick
+                    Tips</h3>
+                <div style="text-align: left;">
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <span style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-right: 10px;"></span>
+                        <span style="color: var(--text-secondary); font-size: 12px;">Use the search bar to find users</span>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <span style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-right: 10px;"></span>
+                        <span style="color: var(--text-secondary); font-size: 12px;">Click on a user to start chatting</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <span style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-right: 10px;"></span>
+                        <span style="color: var(--text-secondary); font-size: 12px;">Messages are delivered instantly</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Display -->
+    {% if messages %}
+        <div id="messagesContainer" style="position: fixed; top: 24px; right: 24px; z-index: 1001; max-width: 320px;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}"
+                     style="background: {% if message.tags == 'success' %}linear-gradient(135deg, var(--secondary-color), var(--primary-color)){% elif message.tags == 'error' %}linear-gradient(135deg, #ff6b6b, #ee5a24){% else %}linear-gradient(135deg, #74b9ff, #0984e3){% endif %}; color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; font-size: 13px; animation: slideIn 0.4s ease-out;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        <style>
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(80px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+        </style>
+{#        <script>#}
+{#            setTimeout(() => {#}
+{#                const container = document.getElementById('messagesContainer');#}
+{#                if (container) {#}
+{#                    container.style.opacity = '0';#}
+{#                    container.style.transition = 'opacity 0.4s';#}
+{#                    setTimeout(() => container.remove(), 400);#}
+{#                }#}
+{#            }, 4000);#}
+{#        </script>#}
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+
+    <script>
+        console.log("SCRIPT LOADED");
+        // Global variables
+        let userMenuVisible = false;
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            const menuBtn = document.getElementById('menuBtn');
+
+            if (!menu) {
+                console.error('Menu element not found');
+                return;
+            }
+
+            userMenuVisible = !userMenuVisible;
+
+            if (userMenuVisible) {
+                menu.classList.add('show');
+                menuBtn.style.background = 'rgba(255,255,255,0.2)';
+            } else {
+                menu.classList.remove('show');
+                menuBtn.style.background = 'transparent';
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM loaded, initializing menu');
+
+            // Ensure menu button works
+            const menuBtn = document.getElementById('menuBtn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', function (e) {
+                    console.log('clicked');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleUserMenu();
+                    userMenu.classList.toggle("show");
+                });
+            }
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function (e) {
+                const menu = document.getElementById('userMenu');
+                const menuBtn = document.getElementById('menuBtn');
+
+                if (menu && menuBtn && !menu.contains(e.target) && !menuBtn.contains(e.target) && userMenuVisible) {
+                    menu.classList.remove('show');
+                    menuBtn.style.background = 'transparent';
+                    userMenuVisible = false;
+                }
+            });
+
+            // Close menu with Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && userMenuVisible) {
+                    const menu = document.getElementById('userMenu');
+                    const menuBtn = document.getElementById('menuBtn');
+                    if (menu) {
+                        menu.classList.remove('show');
+                        menuBtn.style.background = 'transparent';
+                        userMenuVisible = false;
+                    }
+                }
+            });
+        });
+
+        // Enhanced search functionality
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const query = this.value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (query.length > 0) {
+                fetch(`/api/search-users/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resultsDiv.innerHTML = '';
+
+                        if (data.users.length > 0) {
+                            data.users.forEach(user => {
+                                const userDiv = document.createElement('div');
+                                userDiv.style.cssText = 'display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border-color); transition: var(--transition);';
+
+                                const colors = [
+                                    "linear-gradient(135deg, #ff6b6b, #ee5a24)",
+                                    "linear-gradient(135deg, #a29bfe, #6c5ce7)",
+                                    "linear-gradient(135deg, #fd79a8, #e84393)",
+                                    "linear-gradient(135deg, #fdcb6e, #e17055)",
+                                    "linear-gradient(135deg, #74b9ff, #0984e3)",
+                                    "linear-gradient(135deg, #55a3ff, #3742fa)",
+                                    "linear-gradient(135deg, #26de81, #20bf6b)",
+                                    "linear-gradient(135deg, #f7b731, #fa8231)",
+                                ];
+                                const avatarColor = colors[user.id % colors.length];
+
+                                userDiv.innerHTML = `
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: ${avatarColor}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 14px;">
+                                ${user.initials}
+                                ${user.is_online ? '<div style="width: 12px; height: 12px; background-color: var(--secondary-color); border-radius: 50%; border: 2px solid white; position: absolute; bottom: 0; right: 0;"></div>' : ''}
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px; font-size: 13px;">${user.full_name}</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">@${user.username} ${user.is_online ? '• <span style="color: var(--secondary-color);">Online</span>' : ''}</div>
+                            </div>
+                        `;
+
+                                userDiv.addEventListener('mouseenter', () => {
+                                    userDiv.style.backgroundColor = 'var(--hover-color)';
+                                });
+                                userDiv.addEventListener('mouseleave', () => {
+                                    userDiv.style.backgroundColor = 'transparent';
+                                });
+                                userDiv.addEventListener('click', () => {
+                                    window.location.href = `/start-chat/${user.id}/`;
+                                });
+
+                                resultsDiv.appendChild(userDiv);
+                            });
+                            resultsDiv.style.display = 'block';
+                        } else {
+                            resultsDiv.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 12px;">No users found</div>';
+                            resultsDiv.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        resultsDiv.innerHTML = '<div style="padding: 24px; text-align: center; color: #ff6b6b; font-size: 12px;">Search failed. Please try again.</div>';
+                        resultsDiv.style.display = 'block';
+                    });
+            } else {
+                resultsDiv.style.display = 'none';
+            }
+        });
+
+        // Hide search results when clicking outside
+        document.addEventListener('click', function (e) {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+    </script>
+{% endblock %}
+
