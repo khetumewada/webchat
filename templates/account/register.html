@@ -1,53 +1,36 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
+{% if no_layout %}
+    {% include "account/register_form.html" %}
+{% else %}
+    {% block title %}Create Account - WebChat{% endblock %}
+    {% block content %}
+        {% include "account/register_form.html" %}
+    {% endblock %}
+    {% block script %}
+        <script>
+            document.body.addEventListener("htmx:afterSwap", function (evt) {
+                if (evt.detail.target.id === "otp-response") {
+                    const msg = evt.detail.target.querySelector('.success-message');
+                    if (msg) {
+                        setTimeout(() => { msg.style.opacity = "0"; }, 4700);
+                        setTimeout(() => { msg.remove(); }, 5100);
+                    }
+                }
+            });
 
-{% block title %}Create Account - WebChat{% endblock %}
-
-{% block content %}
-<div class="auth-container">
-    <form method="post" class="auth-form">
-        <div style="text-align: center; margin-bottom: 32px;">
-            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 16px; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);">🚀</div>
-            <h2>Join WebChat</h2>
-            <p style="color: #667781; margin-top: 8px; font-size: 13px;">Create your account to get started</p>
-        </div>
-
-        {% csrf_token %}
-
-        {% if form.errors %}
-            <div class="error-message">
-                {% for field, errors in form.errors.items %}
-                    {% for error in errors %}
-                        <div>{{ error }}</div>
-                    {% endfor %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="form-group">
-            <label for="{{ form.username.id_for_label }}">Username</label>
-            <input type="text" id="{{ form.username.id_for_label }}" name="{{ form.username.name }}" value="{{ form.username.value|default:'' }}" required placeholder="Choose a unique username" class="form-input">
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.email.id_for_label }}">Email</label>
-            <input type="email" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" value="{{ form.email.value|default:'' }}" required placeholder="Enter your email address" class="form-input">
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.password1.id_for_label }}">Password</label>
-            <input type="password" id="{{ form.password1.id_for_label }}" name="{{ form.password1.name }}" required placeholder="Create a strong password" class="form-input">
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
-            <input type="password" id="{{ form.password2.id_for_label }}" name="{{ form.password2.name }}" required placeholder="Confirm your password" class="form-input">
-        </div>
-
-        <button type="submit" class="btn-primary">Create Account</button>
-
-        <div class="auth-links">
-            <p style="color: #667781; font-size: 13px;">Already have an account? <a href="{% url 'account:login' %}">Sign in here</a></p>
-        </div>
-    </form>
-</div>
-{% endblock %}
+            function handleOtpClick(button) {
+                const btnText = button.querySelector('.button-text');
+                const spinner = button.querySelector('.spinner');
+                button.disabled = true;
+                btnText.textContent = "Sending...";
+                spinner.style.display = 'inline-block';
+                setTimeout(() => {
+                    button.disabled = false;
+                    btnText.textContent = "Send OTP";
+                    spinner.style.display = 'none';
+                }, 10000);
+            }
+        </script>
+    {% endblock %}
+{% endif %}

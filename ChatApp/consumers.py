@@ -135,6 +135,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return {
                 'id': message.id,
                 'timestamp': message.timestamp.strftime('%I:%M %p').lstrip('0'),
+                # 'timestamp': message.timestamp.isoformat(),
+                # 'timestamp': message.timestamp.astimezone(timezone.utc).isoformat(),
+
+
             }
         except Exception:
             return None

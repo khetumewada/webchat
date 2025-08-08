@@ -32,7 +32,8 @@ def chat_home(request):
     context = {
         'chats': user_chats,
         'current_user': request.user,
-        'today': date.today()
+        'today': date.today(),
+        'is_home_page': True,
     }
     return render(request, 'chatapp/home.html', context)
 
@@ -60,7 +61,8 @@ def chat_room(request, chat_id):
         'current_user': request.user,
         'chats': user_chats,
         'active_chat_id': chat_id,
-        'today': date.today()
+        'today': date.today(),
+        'is_home_page': False,
     }
     return render(request, 'chatapp/room.html', context)
 

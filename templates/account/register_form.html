@@ -1,0 +1,150 @@
+<div id="form-wrapper"
+     style="max-width: 520px; margin: 40px auto; border: 1px solid #e0e0e0; border-top: 4px solid #00a884; border-radius: 12px; background: #fff; box-shadow: 0 8px 32px rgba(0,0,0,0.06); padding: 32px;">
+    <form method="post"
+          action="{% url 'account:register' %}"
+          class="auth-form"
+          hx-post="{% url 'account:register' %}"
+          hx-target="#form-wrapper"
+          hx-swap="outerHTML">
+        {% csrf_token %}
+
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 16px; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);">
+                🚀
+            </div>
+            <h2 style="margin-bottom: 4px;">Join WebChat</h2>
+            <p style="color: #667781; font-size: 13px;">Create your account to get started</p>
+        </div>
+
+        {% if form.errors %}
+            <div class="error-message">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if otp_error %}
+            <div class="error-message">
+                {{ otp_error }}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            <input type="text" id="{{ form.username.id_for_label }}" name="{{ form.username.name }}"
+                   value="{{ form.username.value|default:'' }}" required placeholder="Choose a unique username"
+                   class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            <input type="email" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}"
+                   value="{{ form.email.value|default:'' }}" required placeholder="Enter your email address"
+                   class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="otp">OTP</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text"
+                       name="otp"
+                       id="otp"
+                       placeholder="Enter the OTP"
+                       class="form-input"
+                       style="flex: 1;"
+                       value="{{ request.POST.otp|default:'' }}"
+                       hx-post="{% url 'account:verify_otp' %}"
+                       hx-include="[name='otp']"
+                       hx-target="#otp-verify-status"
+                       hx-trigger="change,blur"
+                       hx-swap="innerHTML"/>
+                <button
+                        type="button"
+                        id="send-otp-btn"
+                        class="btn-otp"
+                        title="Send OTP to your email"
+                        style="height:auto; min-width:58px; padding:12px 16px; font-size:14px; font-weight:500; border-radius:6px; display:flex; align-items:center; gap:6px; border:1px solid #bdd3f9; background:#eaf0fb; color:#255dae;"
+                        hx-post="{% url 'account:send_otp' %}"
+                        hx-include="[name='email']"
+                        hx-target="#otp-response"
+                        hx-swap="innerHTML"
+                        onclick="handleOtpClick(this)"
+                        aria-label="Send One Time Password">
+                    <span class="button-text">Send OTP</span>
+                    <span class="spinner" style="display:none;" aria-live="polite" aria-label="Sending OTP...">
+                        <svg style="vertical-align:middle;" width="14" height="14" viewBox="0 0 50 50">
+                            <circle cx="25" cy="25" r="20" fill="none" stroke="#255dae" stroke-width="4"
+                                    stroke-linecap="round"
+                                    stroke-dasharray="90" stroke-dashoffset="60">
+                                <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25"
+                                                  dur="1s" repeatCount="indefinite"></animateTransform>
+                            </circle>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+            <div id="otp-response" style="margin-top: 5px;"></div>
+            <div id="otp-verify-status" style="margin-top: 5px;"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}">Password</label>
+            <input type="password" id="{{ form.password1.id_for_label }}" name="{{ form.password1.name }}"
+                   required placeholder="Create a strong password" class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+            <input type="password" id="{{ form.password2.id_for_label }}" name="{{ form.password2.name }}"
+                   required placeholder="Confirm your password" class="form-input">
+        </div>
+
+        <button type="submit" class="btn-primary">Create Account</button>
+
+        <div class="auth-links">
+            <p style="color: #667781; font-size: 13px;">Already have an account?
+                <a href="{% url 'account:login' %}">Sign in here</a>
+            </p>
+        </div>
+
+        <a href="{% url 'social:begin' 'google-oauth2' %}"
+           class="btn-google"
+           style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin: 20px 0 8px 0;
+            background: #fff;
+            color: #3b4371;
+            border: 1.5px solid #dde9fc;
+            border-radius: 6px;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.08);
+            transition: box-shadow 0.19s, border 0.18s;
+            text-decoration: none;
+            outline: none;"
+           tabindex="0"
+           aria-label="Sign up with Google">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
+                <g>
+                    <path fill="#4285F4"
+                          d="M44.5 20H24v8.5h11.9C34.7 32.7 30.1 36 24 36A12 12 0 1 1 24 12c2.7 0 5.2 0.9 7.1 2.4l6-6A20 20 0 1 0 44 24c0-1.3-.1-2.3-.3-3.2z"></path>
+                    <path fill="#34A853"
+                          d="M6.3 14.2l7 5.1A11.9 11.9 0 0 1 24 12c2.7 0 5.2 0.9 7.1 2.4l6-6A20 20 0 1 0 44 24c0-1.3-.1-2.3-.3-3.2z"></path>
+                    <path fill="#FBBC05"
+                          d="M44.5 20H24v8.5h11.9C34.7 32.7 30.1 36 24 36A12 12 0 1 1 24 12c2.7 0 5.2 0.9 7.1 2.4l6-6A20 20 0 1 0 44 24c0-1.3-.1-2.3-.3-3.2z"></path>
+                    <path fill="#EA4335"
+                          d="M6.3 33.8l7-5.1C14.8 28.9 19 32 24 32c6.1 0 10.8-3.1 11.9-7.5H24v-8.5h20c.3 1.6.5 3.3.5 5C44.5 29.1 35.2 40 24 40c-6.6 0-12.1-2.6-15.7-6.2z"></path>
+                </g>
+            </svg>
+            <span style="vertical-align:middle;">Sign up with Google</span>
+        </a>
+    </form>
+</div>

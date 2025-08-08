@@ -1,0 +1,138 @@
+{% load chat_extras %}
+<div class="contacts-sidebar">
+    <div class="sidebar-header">
+        <div class="user-profile">
+            {% with userprofile=current_user.userprofile %}
+                {% if userprofile.image %}
+                    <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #fff;">
+                        <img src="{{ userprofile.image.url }}"
+                             alt="Profile Image"
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    </div>
+                {% else %}
+                    <div class="profile-pic"
+                         style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 16px;">
+                        {{ userprofile.get_avatar_initials }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div>
+                <div style="font-weight: 600; font-size: 14px; color: white;">
+                    {{ current_user.get_full_name|default:current_user.username }}
+                </div>
+                <div style="font-size: 11px; color: rgba(255,255,255,0.8);">
+                    @{{ current_user.username }}
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn" title="Menu" id="menuBtn">⋮</button>
+        </div>
+    </div>
+
+    <!-- User Menu Dropdown -->
+    <div id="userMenu" class="dropdown-menu" style="top: 85px; right: 20px;">
+        <div class="dropdown-header">
+            <div style="font-weight: 600; color: white;">{{ current_user.get_full_name|default:current_user.username }}</div>
+            <div style="font-size: 13px; color: rgba(255,255,255,0.8);">@{{ current_user.username }}</div>
+        </div>
+        <div style="padding: 8px 0;">
+            <a href="{% url 'account:profile' %}?next={{ request.path }}
+" class="dropdown-item">
+                <span style="margin-right: 12px; font-size: 16px;">👤</span>
+                Profile Settings
+            </a>
+            <div style="border-top: 1px solid var(--border-color); margin: 6px 0;"></div>
+            <a href="{% url 'account:logout' %}" class="dropdown-item danger">
+                <span style="margin-right: 12px; font-size: 16px;">🚪</span>
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Container -->
+    <div class="search-container">
+        <div style="position: relative;">
+            <input type="text" class="search-box" placeholder="Search users to chat..." id="searchInput">
+            <div id="searchResults"
+                 style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--primary-color); border-top: none; border-radius: 0 0 8px 8px; max-height: 280px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.1);"></div>
+        </div>
+    </div>
+
+    <div class="contacts-list" id="contactsList">
+        {% for chat in chats %}
+            {% if chat.chat_type == 'private' %}
+                {% with other_user=chat|get_other_participant:current_user %}
+                    {% if other_user %}
+                        <a href="{% url 'chatapp:room' chat.id %}" class="contact-item">
+                            <div class="contact-avatar"
+                                 style="background: {{ other_user.id|get_avatar_color }}; position: relative; overflow: hidden; border-radius: 50%; width: 40px; height: 40px;">
+                                {% if other_user.userprofile and other_user.userprofile.image %}
+                                    <img src="{{ other_user.userprofile.image.url }}" alt="Avatar"
+                                         style="width: 100%; height: 100%; object-fit: cover;"/>
+                                {% else %}
+                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                        {{ other_user.userprofile.get_avatar_initials|default:other_user.username|slice:":2"|upper }}
+                                    </div>
+                                {% endif %}
+                                {% if other_user.userprofile.is_online %}
+                                    <div class="online-indicator"></div>
+                                {% endif %}
+                            </div>
+
+                            <div class="contact-info">
+                                <div class="contact-name">{{ other_user.get_full_name|default:other_user.username }}</div>
+                                <div class="contact-last-message">
+                                    {% with last_message=chat.get_last_message %}
+                                        {% if last_message %}
+                                            {% if last_message.sender == current_user %}
+                                                You: {{ last_message.content|truncatechars:30 }}
+                                            {% else %}
+                                                {{ last_message.content|truncatechars:35 }}
+                                            {% endif %}
+                                        {% else %}
+                                            Start a conversation...
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+
+                            <div class="contact-meta">
+                                {% with last_message=chat.get_last_message %}
+                                    {% if last_message.timestamp.date == today %}
+                                        <div class="message-time">
+                                            {{ last_message.timestamp|date:"g:i A" }}</div>
+                                    {% else %}
+                                        <div class="message-time">
+                                            {{ last_message.timestamp|format_message_time }}</div>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+
+                        </a>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        {% empty %}
+            <div style="padding: 48px 24px; text-align: center; color: var(--text-secondary);">
+                <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; margin: 0 auto 20px; opacity: 0.8;">
+                    💬
+                </div>
+                <h3 style="margin-bottom: 12px; color: var(--text-primary); font-weight: 600; font-size: 16px;">
+                    No conversations yet</h3>
+                <p style="line-height: 1.5; font-size: 12px;">Search for users above to start your first
+                    conversation.</p>
+            </div>
+        {% endfor %}
+
+        <!-- Always add Back to Home button except on home page -->
+        {% if not is_home_page %}
+            <a href="{% url 'chatapp:home' %}" class="contact-item"
+               style="margin: 18px 0 0 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; color: var(--primary-color); background: #fff; border-radius: 12px;">
+                <span style="font-size: 20px;">&#8592;</span> Back to Home
+            </a>
+        {% endif %}
+
+    </div>
+</div>

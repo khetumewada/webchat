@@ -14,8 +14,19 @@ class CustomRegisterForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data["email"]
-        if commit:
-            user.save()
+        # if commit:
+        #     user.save()
+        # return user
+        full_name = self.cleaned_data["username"].strip()
+        parts = full_name.split()
+
+        if len(parts) >= 2:
+            user.first_name = parts[0]
+            user.last_name = " ".join(parts[1:])
+        else:
+            user.first_name = full_name
+            user.last_name = ""
+
         return user
 
 
